@@ -1,6 +1,7 @@
 ﻿namespace YaBot.App.Core.State
 {
     using System;
+    using Extensions;
 
     public sealed class States
     {
@@ -19,14 +20,14 @@
             current = start;
         }
 
-        public string Process(IWords words)
+        public Answer Process(IWords words)
         {
             var reset = current != start && stoppers.Match(words); 
             if (reset)
             {
                 current.Reset();
                 current = start;
-                return "Ауф!"; // TODO
+                return "Ауф!".ToAnswer(); // TODO
             }
             
             var (answer, next) = current.Process(words);

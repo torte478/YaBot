@@ -1,4 +1,4 @@
-﻿namespace YaBot.App
+﻿namespace YaBot.App.Configs
 {
     using System;
     using System.Collections.Generic;

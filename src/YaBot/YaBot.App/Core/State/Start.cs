@@ -1,5 +1,7 @@
 ﻿namespace YaBot.App.Core.State
 {
+    using Extensions;
+
     internal sealed class Start : IState
     {
         private readonly IWords names;
@@ -13,18 +15,18 @@
             this.next = next;
         }
 
-        public (string, IState) Process(IWords words)
+        public (Answer, IState) Process(IWords words)
         {
             if (names.Match(words))
             {
                 if (keys.Match(words))
-                    return (string.Empty, next);
+                    return (next.Process(words).Item1, next);
                 else
-                    return ("Звали меня?", this);
+                    return ("Звали меня?".ToAnswer(), this);
             }
             else
             {
-                return (string.Empty, this);
+                return (string.Empty.ToAnswer(), this);
             }
         }
 

@@ -1,12 +1,18 @@
 ﻿namespace YaBot.App
 {
     using System;
+    using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.IO;
     using System.Threading;
+    using Configs;
     using Core;
     using Core.State;
     using Extensions;
+    using Newtonsoft.Json;
     using Telegram.Bot;
+    using Telegram.Bot.Types.InputFiles;
+    using File = System.IO.File;
 
     internal partial class App
     {
@@ -23,7 +29,14 @@
 
             var config = Config.Load(ConfigPath);
 
-            var findPlaceState = new FindPlace();
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "data");
+            var rows = Path
+                .Combine(path, "db.json")
+                ._(File.ReadAllText)
+                ._(JsonConvert.DeserializeObject<DataRow[]>)
+                .ToImmutableArray();
+            
+            var findPlaceState = new FindPlace(path, rows);
             
             var startState = new Start(
                 config.Names._(Words.Create),
@@ -43,6 +56,29 @@
                 new CancellationTokenSource(),
                 (client, cancellation) => client.ReceiveAsync(handler, cancellation),
                 Log);
+        }
+
+        private static ImmutableArray<Answer> InitAnswers()
+        {
+            var directory = Path.Combine(Directory.GetCurrentDirectory(), "data");
+
+            var rows = Path.Combine(directory, "db.json")
+                ._(File.ReadAllText)
+                ._(JsonConvert.DeserializeObject<DataRow[]>);
+
+            var result = new List<Answer>();
+            foreach (var row in rows)
+            {
+                var stream = File.OpenRead(Path.Combine(directory, row.Image));
+                var answer = new Answer
+                {
+                    Text = row.Name,
+                    Image = new InputOnlineFile(stream)
+                };
+                result.Add(answer);
+            }
+
+            return result.ToImmutableArray();
         }
     }
 }

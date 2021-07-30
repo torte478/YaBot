@@ -2,6 +2,7 @@
 {
     using App.Core;
     using App.Core.State;
+    using App.Extensions;
     using FakeItEasy;
     using NUnit.Framework;
 
@@ -18,15 +19,15 @@
             var reset = A.Fake<IWords>();
 
             A.CallTo(() => stoppers.Match(reset)).Returns(true);
-            A.CallTo(() => start.Process(A<IWords>._)).Returns(("start", next));
-            A.CallTo(() => next.Process(A<IWords>._)).Returns(("next", next));
+            A.CallTo(() => start.Process(A<IWords>._)).Returns(("start".ToAnswer(), next));
+            A.CallTo(() => next.Process(A<IWords>._)).Returns(("next".ToAnswer(), next));
 
             var states = new States(start, stoppers, _ => { });
 
             states.Process(changeState);
             states.Process(reset);
             
-            Assert.That(states.Process(A.Fake<IWords>()), Is.EqualTo("start"));
+            Assert.That(states.Process(A.Fake<IWords>()).Text, Is.EqualTo("start"));
         }
     }
 }

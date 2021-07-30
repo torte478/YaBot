@@ -12,11 +12,11 @@
     internal sealed class Bot
     {
         private readonly Func<string, IWords> parse;
-        private readonly Func<Func<IWords, string>> createReceiver;
+        private readonly Func<Func<IWords, Answer>> createReceiver;
 
-        private readonly Dictionary<long, Func<IWords, string>> chats = new();
+        private readonly Dictionary<long, Func<IWords, Answer>> chats = new();
 
-        public Bot(Func<string, IWords> parse, Func<Func<IWords, string>> createReceiver)
+        public Bot(Func<string, IWords> parse, Func<Func<IWords, Answer>> createReceiver)
         {
             this.parse = parse;
             this.createReceiver = createReceiver;
@@ -30,14 +30,21 @@
                 
                 if (!chats.ContainsKey(id))
                     chats.Add(id, createReceiver());
-                    
-                await update.Message.Text
+
+                var answer = update.Message.Text
                     ._(parse)
-                    ._(chats[id])
-                    .If(
-                        _ => !_.Equals(string.Empty),
-                        _ => client.SendTextMessageAsync(update.Message.Chat, _, cancellationToken: cancellation),
-                        _ => Task.CompletedTask);
+                    ._(chats[id]);
+                    
+                if (answer.Text._(string.IsNullOrEmpty))
+                    await Task.CompletedTask;
+                else if (answer.Image != null)
+                {
+                    await client.SendPhotoAsync(update.Message.Chat, answer.Image, answer.Text,
+                        cancellationToken: cancellation);
+                    answer.Image.Content.Dispose();
+                }
+                else
+                    await client.SendTextMessageAsync(update.Message.Chat, answer.Text, cancellationToken: cancellation);
             }
             catch (Exception e)
             {
