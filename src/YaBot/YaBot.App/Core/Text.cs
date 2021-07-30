@@ -5,7 +5,7 @@
     using System.Linq;
     using Extensions;
 
-    internal sealed class Text
+    public sealed class Text
     {
         private readonly Func<IEnumerable<string>, IWords> toWords;
 
@@ -22,6 +22,7 @@
                 .ToArray();
 
             return text
+                .ToLower()
                 .Split()
                 .Select(_ => _.Trim(punctuation))
                 ._(toWords);
