@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    internal interface IWords : IEnumerable<string>
+    public interface IWords : IEnumerable<string>
     {
         bool Match(IWords other);
     }

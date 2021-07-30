@@ -5,10 +5,15 @@
     using System.Collections.Immutable;
     using System.Linq;
 
-    internal sealed class Words : IWords
+    public sealed class Words : IWords
     {
         private readonly ImmutableArray<string> words;
 
+        public static IWords Create(IEnumerable<string> words)
+        {
+            return new Words(words.ToImmutableArray());
+        }
+        
         public Words(ImmutableArray<string> words)
         {
             this.words = words;

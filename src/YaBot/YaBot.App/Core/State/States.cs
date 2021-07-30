@@ -2,7 +2,7 @@
 {
     using System;
 
-    internal sealed class States
+    public sealed class States
     {
         private readonly IState start;
         private readonly IWords stoppers;
@@ -25,6 +25,7 @@
             if (reset)
             {
                 current.Reset();
+                current = start;
                 return "Ауф!"; // TODO
             }
             

@@ -1,8 +1,6 @@
 ﻿namespace YaBot.App
 {
     using System;
-    using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.IO;
     using System.Threading;
     using Core;
@@ -25,23 +23,20 @@
 
             var config = Config.Load(ConfigPath);
 
-            static IWords ToWords(IEnumerable<string> words) => 
-                new Words(words.ToImmutableArray());
-
             var findPlaceState = new FindPlace();
             
             var startState = new Start(
-                config.Names._(ToWords),
-                config.States["Start"].Words._(ToWords),
+                config.Names._(Words.Create),
+                config.States["Start"].Words._(Words.Create),
                 findPlaceState);
 
             var states = new States(
                 startState,
-                config.StopWords._(ToWords),
+                config.StopWords._(Words.Create),
                 Log);
             
             var bot = new Bot(
-                parse: new Text(ToWords).Parse,
+                parse: new Text(Words.Create).Parse,
                 process: states.Process);
 
             var handler = new Handler(bot.ReceiveAsync, Log);
