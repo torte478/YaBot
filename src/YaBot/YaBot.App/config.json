@@ -3,8 +3,11 @@
     "ярык",
     "бот"
   ],
-  "Keywords": {
-    "FindPlace": {
+  "StopWords": [
+    "достаточно"
+  ],
+  "States": {
+    "Start": {
       "WithName": true,
       "Words": [
         "куда",

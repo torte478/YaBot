@@ -8,20 +8,23 @@
     using Telegram.Bot;
     using Telegram.Bot.Extensions.Polling;
 
-    internal partial class App : IDisposable
+    internal sealed partial class App : IDisposable
     {
         private readonly ITelegramBotClient me;
         private readonly CancellationTokenSource cancellation;
         private readonly Func<ITelegramBotClient, CancellationToken, Task> run;
+        private readonly Action<string> log;
 
         private App(
             ITelegramBotClient me, 
             CancellationTokenSource cancellation, 
-            Func<ITelegramBotClient, CancellationToken, Task> run)
+            Func<ITelegramBotClient, CancellationToken, Task> run,
+            Action<string> log)
         {
             this.me = me;
             this.cancellation = cancellation;
             this.run = run;
+            this.log = log;
         }
 
         public void Run()
@@ -30,12 +33,12 @@
                 .GetMeAsync()
                 .Result
                 ._(_ => $"{_.Username} started at {DateTime.Now}")
-                ._(Console.WriteLine);
+                ._(log);
 
             var task = me._(run, cancellation.Token);
             
             Console.ReadLine()
-                ._(_ => Console.WriteLine("stopped"))
+                ._(_ => log("stopped"))
                 ._(_ => cancellation.Cancel());
             
         }

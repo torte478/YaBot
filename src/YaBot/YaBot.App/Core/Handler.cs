@@ -3,27 +3,39 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Extensions;
     using Telegram.Bot;
     using Telegram.Bot.Extensions.Polling;
     using Telegram.Bot.Types;
     using Telegram.Bot.Types.Enums;
 
-    public class Handler : IUpdateHandler
+    public sealed class Handler : IUpdateHandler
     {
+        private readonly Func<ITelegramBotClient, Update, CancellationToken, Task> receive;
+        private readonly Action<string> log;
+
         public UpdateType[]? AllowedUpdates { get; }
+
+        public Handler(Func<ITelegramBotClient, Update, CancellationToken, Task> receive, Action<string> log)
+        {
+            this.receive = receive;
+            this.log = log;
+        }
 
         public Task HandleUpdate(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            if (update.Message == null)
-                return Task.CompletedTask;
-            
-            return botClient.SendTextMessageAsync(update.Message.Chat, $"Answer: {update.Message.Text}");
+            return update.Message?.Text != null
+                ? update
+                    ._(_ => log($"=> {_.Message.Text}"))
+                    ._(_ => receive(botClient, _, cancellationToken))
+                : Task.CompletedTask;
         }
         
         public Task HandleError(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
-            Console.WriteLine(exception.ToString());
-            return Task.CompletedTask;
+            return exception
+                ._(_ => _.ToString()._(log))
+                ._(_ => Task.CompletedTask);
         }
     }
 }
