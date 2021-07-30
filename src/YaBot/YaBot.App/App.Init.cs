@@ -30,14 +30,11 @@
                 config.States["Start"].Words._(Words.Create),
                 findPlaceState);
 
-            var states = new States(
-                startState,
-                config.StopWords._(Words.Create),
-                Log);
+            var stoppers = config.StopWords._(Words.Create);
             
             var bot = new Bot(
                 parse: new Text(Words.Create).Parse,
-                process: states.Process);
+                createReceiver: () => new States(startState, stoppers, Log).Process); 
 
             var handler = new Handler(bot.ReceiveAsync, Log);
 
