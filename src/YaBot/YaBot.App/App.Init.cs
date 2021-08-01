@@ -47,7 +47,8 @@
             
             var bot = new Bot(
                 parse: new Text(Words.Create).Parse,
-                createReceiver: () => new States(startState, stoppers, Log).Process); 
+                createReceiver: () => new States(startState, stoppers, Log).Process,
+                begin: DateTime.UtcNow); 
 
             var handler = new Handler(bot.ReceiveAsync, Log);
 

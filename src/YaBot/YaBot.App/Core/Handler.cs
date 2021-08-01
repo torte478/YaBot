@@ -1,4 +1,5 @@
-﻿namespace YaBot.App.Core
+﻿#nullable enable
+namespace YaBot.App.Core
 {
     using System;
     using System.Threading;
@@ -26,7 +27,9 @@
         {
             return update.Message?.Text != null
                 ? update
+#if DEBUG
                     ._(_ => log($"=> {_.Message.Text}"))
+#endif
                     ._(_ => receive(botClient, _, cancellationToken))
                 : Task.CompletedTask;
         }

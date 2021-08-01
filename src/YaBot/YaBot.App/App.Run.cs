@@ -35,12 +35,10 @@
                 ._(_ => $"{_.Username} started at {DateTime.Now}")
                 ._(log);
 
-            var task = me._(run, cancellation.Token);
-            
-            Console.ReadLine()
-                ._(_ => log("stopped"))
-                ._(_ => cancellation.Cancel());
-            
+            var main = me._(run, cancellation.Token);
+            var exit = Task.Delay(int.MaxValue, cancellation.Token);
+
+            Task.WaitAny(main, exit);
         }
 
         public void Dispose()

@@ -18,7 +18,7 @@
             }
             catch (Exception e)
             {
-                throw new Exception("Config format error");
+                throw new Exception($"Config format error: {e.Message}", e);
             }
         }
         
