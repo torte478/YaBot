@@ -2,6 +2,7 @@
 {
     using System;
     using Extensions;
+    using Telegram.Bot.Types;
 
     public sealed class States
     {
@@ -20,9 +21,9 @@
             current = start;
         }
 
-        public Answer Process(IWords words)
+        public Answer Process(Message message)
         {
-            var reset = current != start && stoppers.Match(words); 
+            var reset = current != start && stoppers.Match(message); 
             if (reset)
             {
                 current.Reset();
@@ -30,7 +31,7 @@
                 return "Ауф!".ToAnswer(); // TODO
             }
             
-            var (answer, next) = current.Process(words);
+            var (answer, next) = current.Process(message);
             
             if (current != next)
                 log($"{current} => {next}");

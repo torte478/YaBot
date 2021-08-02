@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
+    using Telegram.Bot.Types;
 
     public sealed class Words : IWords
     {
@@ -19,9 +20,10 @@
             this.words = words;
         }
 
-        public bool Match(IWords other)
+        public bool Match(Message message)
         {
-            return words.Any(other.Contains);
+            return message.Text != null 
+                   && words.Any(message.Text.Contains);
         }
         
         public IEnumerator<string> GetEnumerator()

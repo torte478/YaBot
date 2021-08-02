@@ -5,6 +5,7 @@
     using App.Extensions;
     using FakeItEasy;
     using NUnit.Framework;
+    using Telegram.Bot.Types;
 
     [TestFixture]
     internal sealed class States_Should
@@ -15,19 +16,19 @@
             var start = A.Fake<IState>();
             var next = A.Fake<IState>();
             var stoppers = A.Fake<IWords>();
-            var changeState = A.Fake<IWords>();
-            var reset = A.Fake<IWords>();
+            var changeState = A.Fake<Message>();
+            var reset = A.Fake<Message>();
 
             A.CallTo(() => stoppers.Match(reset)).Returns(true);
-            A.CallTo(() => start.Process(A<IWords>._)).Returns(("start".ToAnswer(), next));
-            A.CallTo(() => next.Process(A<IWords>._)).Returns(("next".ToAnswer(), next));
+            A.CallTo(() => start.Process(A<Message>._)).Returns(("start".ToAnswer(), next));
+            A.CallTo(() => next.Process(A<Message>._)).Returns(("next".ToAnswer(), next));
 
             var states = new States(start, stoppers, _ => { });
 
             states.Process(changeState);
             states.Process(reset);
             
-            Assert.That(states.Process(A.Fake<IWords>()).Text, Is.EqualTo("start"));
+            Assert.That(states.Process(A.Fake<Message>()).Text, Is.EqualTo("start"));
         }
     }
 }

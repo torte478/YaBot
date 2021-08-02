@@ -10,7 +10,7 @@
     internal sealed class Handler_Should
     {
         [Test]
-        public void IgnoreUpdate_WhenTypeIsNotText()
+        public void AllowUpdate_WhenTypeIsNotText()
         {
             var called = false;
             var handler = new Handler(
@@ -24,7 +24,7 @@
 
             handler.HandleUpdate(null, update, new CancellationToken()).Wait();
 
-            Assert.That(called, Is.False);
+            Assert.That(called, Is.True);
         }
     }
 }

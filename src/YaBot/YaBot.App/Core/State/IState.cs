@@ -1,8 +1,11 @@
 ﻿namespace YaBot.App.Core.State
 {
+    using Telegram.Bot.Types;
+
     public interface IState
     {
-        (Answer, IState) Process(IWords words);
+        bool IsInput(Message message);
+        (Answer, IState) Process(Message message);
         IState Reset();
     }
 }
