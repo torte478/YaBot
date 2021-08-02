@@ -4,11 +4,14 @@
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using Configs;
     using Core;
+    using Core.Database;
     using Core.State;
     using Extensions;
+    using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json;
     using Telegram.Bot;
     using Telegram.Bot.Types.InputFiles;
@@ -28,6 +31,8 @@
                 ._(Console.WriteLine);
 
             var config = Config.Load(ConfigPath);
+            
+            var context = new Context(config.ConnectionString);
 
             var path = Path.Combine(Directory.GetCurrentDirectory(), "data");
             var rows = Path
@@ -36,18 +41,23 @@
                 ._(JsonConvert.DeserializeObject<DataRow[]>)
                 .ToImmutableArray();
             
-            var findPlaceState = new FindPlace(path, rows);
-            
-            var startState = new Start(
+            var findPlaceState = new GetRandomPlaceState(path, rows);
+
+            var startState = new StartState(
                 config.Names._(Words.Create),
-                config.States["Start"].Words._(Words.Create),
-                findPlaceState);
+                new IState[]
+                {
+                    new StartCreatePlaceState(
+                        config.States["StartCreatePlace"].Words._(Words.Create),
+                        new FinishCreatePlaceState() 
+                    ),
+                    findPlaceState
+                }
+                .ToImmutableArray());
 
             var stoppers = config.StopWords._(Words.Create);
             
-            var bot = new Bot(
-                parse: new Text(Words.Create).Parse,
-                createReceiver: () => new States(startState, stoppers, Log).Process,
+            var bot = new Bot(createReceiver: () => new States(startState, stoppers, Log).Process,
                 begin: DateTime.UtcNow); 
 
             var handler = new Handler(bot.ReceiveAsync, Log);
