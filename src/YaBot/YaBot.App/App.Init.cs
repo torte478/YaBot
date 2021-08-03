@@ -49,7 +49,7 @@
                 {
                     new StartCreatePlaceState(
                         config.States["StartCreatePlace"].Words._(Words.Create),
-                        new FinishCreatePlaceState() 
+                        new FinishCreatePlaceState(context) 
                     ),
                     findPlaceState
                 }
@@ -66,6 +66,7 @@
                 new TelegramBotClient(token),
                 new CancellationTokenSource(),
                 (client, cancellation) => client.ReceiveAsync(handler, cancellation),
+                context,
                 Log);
         }
 

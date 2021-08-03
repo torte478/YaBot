@@ -32,6 +32,8 @@
             }
             
             var (answer, next) = current.Process(message);
+
+            next ??= start;
             
             if (current != next)
                 log($"{current} => {next}");
