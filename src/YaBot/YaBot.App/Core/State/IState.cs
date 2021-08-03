@@ -4,8 +4,8 @@
 
     public interface IState
     {
-        bool IsInput(Message message);
-        (Answer, IState) Process(Message message);
+        bool IsInput(Input input);
+        (Output, IState) Process(Input input);
         IState Reset();
     }
 }

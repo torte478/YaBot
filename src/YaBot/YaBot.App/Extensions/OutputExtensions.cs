@@ -4,7 +4,7 @@
 
     public static class AnswerExtensions
     {
-        public static Answer ToAnswer(this string text)
+        public static Output ToAnswer(this string text)
         {
             return new() {Text = text};
         }

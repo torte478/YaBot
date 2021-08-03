@@ -70,7 +70,7 @@
                 Log);
         }
 
-        private static ImmutableArray<Answer> InitAnswers()
+        private static ImmutableArray<Output> InitAnswers()
         {
             var directory = Path.Combine(Directory.GetCurrentDirectory(), "data");
 
@@ -78,11 +78,11 @@
                 ._(File.ReadAllText)
                 ._(JsonConvert.DeserializeObject<DataRow[]>);
 
-            var result = new List<Answer>();
+            var result = new List<Output>();
             foreach (var row in rows)
             {
                 var stream = File.OpenRead(Path.Combine(directory, row.Image));
-                var answer = new Answer
+                var answer = new Output
                 {
                     Text = row.Name,
                     Image = new InputOnlineFile(stream)

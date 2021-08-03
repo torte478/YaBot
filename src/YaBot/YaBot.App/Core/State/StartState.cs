@@ -16,19 +16,19 @@
             this.next = next;
         }
 
-        public bool IsInput(Message message)
+        public bool IsInput(Input input)
         {
             return true;
         }
 
-        public (Answer, IState) Process(Message message)
+        public (Output, IState) Process(Input input)
         {
-            if (!names.Match(message))
+            if (!names.Match(input.Message))
                 return (string.Empty.ToAnswer(), this);
 
             return next
-                   .FirstOrDefault(_ => _.IsInput(message))
-                   ?._(_ => _.Process(message))
+                   .FirstOrDefault(_ => _.IsInput(input))
+                   ?._(_ => _.Process(input))
                ?? 
                ("Звали меня?".ToAnswer(), this); // TODO
         }

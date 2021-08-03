@@ -10,12 +10,12 @@
 
     public sealed class Bot
     {
-        private readonly Func<Func<Message, Answer>> createReceiver;
+        private readonly Func<Func<Input, Output>> createReceiver;
         private readonly DateTime begin;
 
-        private readonly Dictionary<long, Func<Message, Answer>> chats = new();
+        private readonly Dictionary<long, Func<Input, Output>> chats = new();
 
-        public Bot(Func<Func<Message, Answer>> createReceiver, DateTime begin)
+        public Bot(Func<Func<Input, Output>> createReceiver, DateTime begin)
         {
             this.createReceiver = createReceiver;
             this.begin = begin;
@@ -33,7 +33,11 @@
                 if (!chats.ContainsKey(id))
                     chats.Add(id, createReceiver());
 
-                var answer = update.Message
+                var answer = new Input
+                {
+                    Client = client,
+                    Message = update.Message
+                }
                     ._(chats[id]);
                     
                 if (answer.Text._(string.IsNullOrEmpty))

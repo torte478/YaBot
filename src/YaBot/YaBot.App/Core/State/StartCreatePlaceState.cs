@@ -5,21 +5,21 @@
 
     internal sealed class StartCreatePlaceState : IState
     {
-        private readonly IWords input;
+        private readonly IWords keys;
         private readonly IState next;
 
-        public StartCreatePlaceState(IWords input, IState next)
+        public StartCreatePlaceState(IWords keys, IState next)
         {
-            this.input = input;
+            this.keys = keys;
             this.next = next;
         }
 
-        public bool IsInput(Message message)
+        public bool IsInput(Input input)
         {
-            return input.Match(message);
+            return keys.Match(input.Message);
         }
 
-        public (Answer, IState) Process(Message message)
+        public (Output, IState) Process(Input input)
         {
             return (
                 "Введите название места. Будет здорово, если вы прикрепите его фотографию".ToAnswer(), // TODO

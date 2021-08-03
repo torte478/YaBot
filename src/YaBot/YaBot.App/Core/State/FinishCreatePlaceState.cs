@@ -1,9 +1,10 @@
 ﻿namespace YaBot.App.Core.State
 {
+    using System.IO;
+    using System.Linq;
     using Castle.Core.Internal;
     using Database;
     using Extensions;
-    using Telegram.Bot.Types;
 
     internal sealed class FinishCreatePlaceState : IState
     {
@@ -14,15 +15,19 @@
             this.context = context;
         }
 
-        public bool IsInput(Message message)
+        public bool IsInput(Input input)
         {
             // TODO : is text with image
-            return !message.Text.IsNullOrEmpty();
+            return !input.Message.Text.IsNullOrEmpty()
+                || input.Message.Photo != null;
         }
 
-        public (Answer, IState) Process(Message message)
+        public (Output, IState) Process(Input input)
         {
-            new Place {Name = message.Text}
+            // TODO : null validators
+            
+            input
+                ._(GetPlace)
                 ._(context.Places.Add)
                 ._(_ => context.SaveChanges());
 
@@ -33,5 +38,25 @@
         {
             return this;
         }
+
+        private static Place GetPlace(Input input)
+        {
+            if (input.Message.Photo == null)
+                return new Place { Name = input.Message.Text };
+            
+            var photo = input.Message.Photo
+                .OrderByDescending(_ => _.Width * _.Height)
+                .First();
+                
+            using var stream = new MemoryStream();
+            input.Client.GetInfoAndDownloadFileAsync(photo.FileId, stream).Wait(); // TODO : to async
+
+            return new Place
+            {
+                Name = input.Message.Caption,
+                Image = stream.ToArray()
+            };
+        }
+        
     }
 }

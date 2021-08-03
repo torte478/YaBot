@@ -21,9 +21,9 @@
             current = start;
         }
 
-        public Answer Process(Message message)
+        public Output Process(Input input)
         {
-            var reset = current != start && stoppers.Match(message); 
+            var reset = current != start && stoppers.Match(input.Message); 
             if (reset)
             {
                 current.Reset();
@@ -31,7 +31,7 @@
                 return "Ауф!".ToAnswer(); // TODO
             }
             
-            var (answer, next) = current.Process(message);
+            var (answer, next) = current.Process(input);
 
             next ??= start;
             

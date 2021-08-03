@@ -20,16 +20,16 @@
             this.path = path;
         }
 
-        public bool IsInput(Message message)
+        public bool IsInput(Input input)
         {
             return false; // TODO
         }
 
-        public (Answer, IState) Process(Message message)
+        public (Output, IState) Process(Input input)
         {
             var row = rows[(++index) % rows.Length];
             var stream = File.OpenRead(Path.Combine(path, row.Image));
-            var answer = new Answer
+            var answer = new Output
             {
                 Text = row.Name,
                 Image = new InputOnlineFile(stream)
