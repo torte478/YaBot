@@ -1,7 +1,6 @@
 ﻿namespace YaBot.App.Core.State
 {
     using Extensions;
-    using Telegram.Bot.Types;
 
     internal sealed class StartCreatePlaceState : IState
     {

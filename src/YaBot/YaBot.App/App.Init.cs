@@ -53,6 +53,14 @@
                     new StartGetState(
                         new FinishGetState(
                             _ => context.Places.ToList()[_])), // TODO : replace from init
+                    new StartDeleteState(
+                        new FinishDeleteState(
+                            _ =>
+                            {
+                                var place = context.Places.ToList()[_];
+                                context.Places.Remove(place);
+                                context.SaveChanges();
+                            })),
                     new GetRandomPlaceState(path, rows)
                 }
                 .ToImmutableArray());
