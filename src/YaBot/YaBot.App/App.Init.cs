@@ -32,13 +32,6 @@
             var config = Config.Load(ConfigPath);
             
             var context = new Context(credentials.Database);
-
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "data");
-            var rows = Path
-                .Combine(path, "db.json")
-                ._(File.ReadAllText)
-                ._(JsonConvert.DeserializeObject<DataRow[]>)
-                .ToImmutableArray();
             
             var startState = new StartState(
                 config.Names._(Words.Create),
@@ -57,11 +50,14 @@
                         new FinishDeleteState(
                             _ =>
                             {
+                                // TODO : replace from init
                                 var place = context.Places.ToList()[_];
                                 context.Places.Remove(place);
                                 context.SaveChanges();
                             })),
-                    new GetRandomPlaceState(path, rows)
+                    new GetRandomPlaceState(
+                        config.States["Start"].Words._(Words.Create),
+                        () => context.Places) // TODO : replace from init
                 }
                 .ToImmutableArray());
 

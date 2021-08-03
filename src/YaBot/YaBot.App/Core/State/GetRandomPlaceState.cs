@@ -1,50 +1,84 @@
 ﻿namespace YaBot.App.Core.State
 {
-    using System.Collections.Immutable;
+    using System;
+    using System.Collections.Generic;
     using System.IO;
-    using Configs;
-    using Telegram.Bot.Types;
+    using Database;
+    using Extensions;
     using Telegram.Bot.Types.InputFiles;
-    using File = System.IO.File;
 
-    internal sealed class GetRandomPlaceState : IState
+    public sealed class GetRandomPlaceState : IState
     {
-        private readonly string path;
-        private readonly ImmutableArray<DataRow> rows;
+        private readonly Random random = new();
+        
+        private readonly IWords keys;
+        private readonly Func<IEnumerable<Place>> getPlaces;
 
+        private readonly List<Place> places = new();
         private int index = 0;
 
-        public GetRandomPlaceState(string path, ImmutableArray<DataRow> rows)
+        public GetRandomPlaceState(IWords keys, Func<IEnumerable<Place>> getPlaces)
         {
-            this.rows = rows;
-            this.path = path;
+            this.keys = keys;
+            this.getPlaces = getPlaces;
         }
 
         public bool IsInput(Input input)
         {
-            return false; // TODO
+            return keys.Match(input.Message);
         }
 
         public (Output, IState) Process(Input input)
         {
-            var row = rows[(++index) % rows.Length];
-            var stream = File.OpenRead(Path.Combine(path, row.Image));
+            if (index >= places.Count)
+                ReloadPlaces();
+
+            var place = places[index++];
+
+            return place._(ToAnswer);
+        }
+
+        private (Output, IState) ToAnswer(Place place)
+        {
+            //TODO : GetState duplicate
+            
+            if (place.Image == null)
+                return (place.Name.ToOutput(), this);
+
+            var stream = new MemoryStream(place.Image);
             var answer = new Output
             {
-                Text = row.Name,
-                Image = new InputOnlineFile(stream)
+                Text = place.Name,
+                Image = new InputOnlineFile(stream) // TODO : refactor Telegram.Bot.Api using
             };
             return (answer, this);
         }
 
         public IState Reset()
         {
+            index = 0;
+            places.Clear();
             return this;
         }
 
-        public override string ToString()
+        private void ReloadPlaces()
         {
-            return "FindPlace";
+            Reset();
+            
+            // TODO : write better algorithm
+            
+            var input = getPlaces() 
+                ._(_ => new LinkedList<Place>(_));
+
+            while (input.Count > 0)
+            {
+                var current = input.First;
+                for (var i = random.Next(input.Count); i > 0; --i)
+                    current = current.Next;
+                
+                places.Add(current.Value);
+                input.Remove(current);
+            }
         }
     }
 }
