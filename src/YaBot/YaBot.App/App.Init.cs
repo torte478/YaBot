@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Immutable;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using Configs;
     using Core;
@@ -48,7 +49,10 @@
                         new FinishCreatePlaceState(context) 
                     ),
                     new ListState(
-                        () => context.Places),
+                        () => context.Places), // TODO : replace from init
+                    new StartGetState(
+                        new FinishGetState(
+                            _ => context.Places.ToList()[_])), // TODO : replace from init
                     new GetRandomPlaceState(path, rows)
                 }
                 .ToImmutableArray());
