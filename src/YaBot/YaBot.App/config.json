@@ -18,6 +18,13 @@
         "стартуем",
         "start"
       ]
+    },
+    "StartCreatePlace": {
+      "WithName": true,
+      "Words": [
+        "создай",
+        "create"
+      ]
     }
   }
 }

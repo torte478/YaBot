@@ -25,7 +25,6 @@
         public string[] Names { get; set; }
         public string[] StopWords { get; set; }
         public Dictionary<string, State> States { get; set; }
-        public string ConnectionString { get; set; }
 
         internal sealed class State
         {

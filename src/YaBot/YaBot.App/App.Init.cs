@@ -4,14 +4,12 @@
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.IO;
-    using System.Linq;
     using System.Threading;
     using Configs;
     using Core;
     using Core.Database;
     using Core.State;
     using Extensions;
-    using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json;
     using Telegram.Bot;
     using Telegram.Bot.Types.InputFiles;
@@ -20,11 +18,13 @@
     internal partial class App
     {
         private const string ConfigPath = "config.json";
-        private const string TokenPath = "token";
+        private const string CredentialsPath = "credentials.json";
 
         public static App Init()
         {
-            var token = File.ReadAllText(TokenPath);
+            var credentials = CredentialsPath
+                ._(File.ReadAllText)
+                ._(JsonConvert.DeserializeObject<Credentials>);
 
             static void Log(string text) => 
                 $"{DateTime.Now.ToLongTimeString()} {text}"
@@ -32,7 +32,7 @@
 
             var config = Config.Load(ConfigPath);
             
-            var context = new Context(config.ConnectionString);
+            var context = new Context(credentials.Database);
 
             var path = Path.Combine(Directory.GetCurrentDirectory(), "data");
             var rows = Path
@@ -63,7 +63,7 @@
             var handler = new Handler(bot.ReceiveAsync, Log);
 
             return new App(
-                new TelegramBotClient(token),
+                new TelegramBotClient(credentials.Telegram),
                 new CancellationTokenSource(),
                 (client, cancellation) => client.ReceiveAsync(handler, cancellation),
                 context,
