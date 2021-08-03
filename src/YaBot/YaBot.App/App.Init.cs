@@ -1,7 +1,6 @@
 ﻿namespace YaBot.App
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.IO;
     using System.Threading;
@@ -12,7 +11,6 @@
     using Extensions;
     using Newtonsoft.Json;
     using Telegram.Bot;
-    using Telegram.Bot.Types.InputFiles;
     using File = System.IO.File;
 
     internal partial class App
@@ -41,8 +39,6 @@
                 ._(JsonConvert.DeserializeObject<DataRow[]>)
                 .ToImmutableArray();
             
-            var findPlaceState = new GetRandomPlaceState(path, rows);
-
             var startState = new StartState(
                 config.Names._(Words.Create),
                 new IState[]
@@ -51,7 +47,9 @@
                         config.States["StartCreatePlace"].Words._(Words.Create),
                         new FinishCreatePlaceState(context) 
                     ),
-                    findPlaceState
+                    new ListState(
+                        () => context.Places),
+                    new GetRandomPlaceState(path, rows)
                 }
                 .ToImmutableArray());
 
@@ -68,29 +66,6 @@
                 (client, cancellation) => client.ReceiveAsync(handler, cancellation),
                 context,
                 Log);
-        }
-
-        private static ImmutableArray<Output> InitAnswers()
-        {
-            var directory = Path.Combine(Directory.GetCurrentDirectory(), "data");
-
-            var rows = Path.Combine(directory, "db.json")
-                ._(File.ReadAllText)
-                ._(JsonConvert.DeserializeObject<DataRow[]>);
-
-            var result = new List<Output>();
-            foreach (var row in rows)
-            {
-                var stream = File.OpenRead(Path.Combine(directory, row.Image));
-                var answer = new Output
-                {
-                    Text = row.Name,
-                    Image = new InputOnlineFile(stream)
-                };
-                result.Add(answer);
-            }
-
-            return result.ToImmutableArray();
         }
     }
 }

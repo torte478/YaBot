@@ -19,8 +19,8 @@
             var reset = A.Fake<Input>();
 
             A.CallTo(() => stoppers.Match(reset.Message)).Returns(true);
-            A.CallTo(() => start.Process(A<Input>._)).Returns(("start".ToAnswer(), next));
-            A.CallTo(() => next.Process(A<Input>._)).Returns(("next".ToAnswer(), next));
+            A.CallTo(() => start.Process(A<Input>._)).Returns(("start".ToOutput(), next));
+            A.CallTo(() => next.Process(A<Input>._)).Returns(("next".ToOutput(), next));
 
             var states = new States(start, stoppers, _ => { });
 

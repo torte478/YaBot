@@ -24,13 +24,13 @@
         public (Output, IState) Process(Input input)
         {
             if (!names.Match(input.Message))
-                return (string.Empty.ToAnswer(), this);
+                return (string.Empty.ToOutput(), this);
 
             return next
                    .FirstOrDefault(_ => _.IsInput(input))
                    ?._(_ => _.Process(input))
                ?? 
-               ("Звали меня?".ToAnswer(), this); // TODO
+               ("Звали меня?".ToOutput(), this); // TODO
         }
 
         public IState Reset()

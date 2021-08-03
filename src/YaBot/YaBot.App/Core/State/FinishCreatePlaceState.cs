@@ -31,7 +31,7 @@
                 ._(context.Places.Add)
                 ._(_ => context.SaveChanges());
 
-            return ("Новое место сохранено".ToAnswer(), null); // (TODO, TODO)
+            return ("Новое место сохранено".ToOutput(), null); // (TODO, TODO)
         }
 
         public IState Reset()

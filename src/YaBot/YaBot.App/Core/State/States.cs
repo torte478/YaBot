@@ -28,7 +28,7 @@
             {
                 current.Reset();
                 current = start;
-                return "Ауф!".ToAnswer(); // TODO
+                return "Ауф!".ToOutput(); // TODO
             }
             
             var (answer, next) = current.Process(input);
