@@ -29,3 +29,4 @@ fix public-internal
 strings to resources
 экстренное выключение
 crud.delete(item) -> to extension
+optimize CrudState

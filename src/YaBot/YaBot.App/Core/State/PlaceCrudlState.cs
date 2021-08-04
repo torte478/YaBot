@@ -10,6 +10,8 @@
 
     public sealed class PlaceCrudlState : IState
     {
+        private const int Undefined = -1;
+        
         private readonly Keys keys;
         private readonly ICrudl<int, Place> places;
         
@@ -61,10 +63,9 @@
 
         private (Output, IState) RunDelete(Input input)
         {
-            //TODO : validation
-
-            if (int.TryParse(input.Message.Text, out var index).Not())
-                return (keys.Error.ToError("Неправильный формат. Введите только индекс").ToOutput(), this);
+            var (index, error) = TryParseIndex(input.Message);
+            if (index == Undefined)
+                return (keys.Error.ToError(error).ToOutput(), this);
 
             var place = places.Enumerate().ToList()[index];
             places.Delete(place.Id);
@@ -73,12 +74,28 @@
             return (keys.Delete.Success.ToRandomOutput(), null);
         }
 
+        private (int, string) TryParseIndex(Message message)
+        {
+            if (message.Text == null)
+                return (Undefined, "Необходимо ввести текстовое сообщение");
+
+            var list = places.Enumerate().ToList();
+            var min = 0;
+            var max = list.Count - 1;
+            
+            if (int.TryParse(message.Text, out var index).Not()
+                || index < min
+                || index > max)
+                return (Undefined, $"Неправильный формат. Нужно ввести число в диапазоне {min} - {max}");
+
+            return (index, null);
+        }
+
         private (Output, IState) RunRead(Input input)
         {
-            //TODO : validation
-
-            if (int.TryParse(input.Message.Text, out var index).Not())
-                return (keys.Error.ToError("Неправильный формат. Введите только индекс").ToOutput(), this);
+            var (index, error) = TryParseIndex(input.Message);
+            if (index == Undefined)
+                return (keys.Error.ToError(error).ToOutput(), this);
 
             var place = places.Enumerate().ToList()[index];
 
