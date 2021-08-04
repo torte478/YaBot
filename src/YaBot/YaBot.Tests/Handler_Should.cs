@@ -26,5 +26,33 @@
 
             Assert.That(called, Is.True);
         }
+
+        [Test]
+        public void CheckThatMessageIsNotNull_WhenLog()
+        {
+            var handler = new Handler((_, _, _) => Task.CompletedTask, _ => { });
+
+            Assert.DoesNotThrow(() =>
+            {
+                handler.HandleUpdate(null, new Update(), new CancellationToken()).Wait();
+            });
+        }
+
+        [Test]
+        public void IgnoreMessage_WhenItIsNull()
+        {
+            var called = false;
+            var handler = new Handler(
+                (_, _, _) => 
+                { 
+                    called = true;
+                    return Task.CompletedTask;
+                },
+                _ => { });
+
+            handler.HandleUpdate(null, new Update(), new CancellationToken()).Wait();
+
+            Assert.That(called, Is.False);
+        }
     }
 }

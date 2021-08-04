@@ -4,7 +4,7 @@ namespace YaBot.App.Core.Database
 {
     using Microsoft.EntityFrameworkCore;
 
-    public class Context : DbContext
+    public partial class Context : DbContext
     {
         private readonly string connectionString;
         
@@ -50,9 +50,6 @@ namespace YaBot.App.Core.Database
             OnModelCreatingPartial(modelBuilder);
         }
 
-        private void OnModelCreatingPartial(ModelBuilder modelBuilder)
-        {
-            throw new System.NotImplementedException();
-        }
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

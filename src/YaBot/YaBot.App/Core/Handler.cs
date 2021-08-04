@@ -25,10 +25,11 @@ namespace YaBot.App.Core
 
         public Task HandleUpdate(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
+            if (update.Message == null)
+                return Task.CompletedTask;
+
             return update
-#if DEBUG
-                ._(_ => log($"=> {_.Message.Text}"))
-#endif
+                ._(_ => log($"=> {_?.Message?.Text ?? string.Empty}"))
                 ._(_ => receive(botClient, _, cancellationToken));
         }
         

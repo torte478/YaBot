@@ -25,10 +25,6 @@
                 ._(File.ReadAllText)
                 ._(JsonConvert.DeserializeObject<Credentials>);
 
-            static void Log(string text) => 
-                $"{DateTime.Now.ToLongTimeString()} {text}"
-                ._(Console.WriteLine);
-
             var config = Config.Load(ConfigPath);
             
             var context = new Context(credentials.Database);
@@ -69,6 +65,19 @@
                 (client, cancellation) => client.ReceiveAsync(handler, cancellation),
                 context,
                 Log);
+        }
+
+        private static void Log(string message)
+        {
+            #if DEBUG
+
+            if (string.IsNullOrEmpty(message))
+                return;
+            
+            $"{DateTime.Now.ToLongTimeString()} {message}"
+                ._(Console.WriteLine);
+            
+            #endif
         }
     }
 }
