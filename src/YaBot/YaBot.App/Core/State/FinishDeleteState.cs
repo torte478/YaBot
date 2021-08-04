@@ -5,11 +5,15 @@
 
     public sealed class FinishDeleteState : IState
     {
-        private readonly Action<int> deletePlace; // TODO : to Func<int, bool>
+        private readonly Action<int> deletePlace;
+        private readonly IWords error;
+        private readonly IWords success;
 
-        public FinishDeleteState(Action<int> deletePlace)
+        public FinishDeleteState(IWords error, IWords success, Action<int> deletePlace)
         {
             this.deletePlace = deletePlace;
+            this.error = error;
+            this.success = success;
         }
 
         public bool IsInput(Input input)
@@ -22,11 +26,11 @@
             //TODO : validation
 
             if (int.TryParse(input.Message.Text, out var index).Not())
-                return ("Неправильный формат. Введите только индекс".ToOutput(), this);
+                return (error.ToError("Неправильный формат. Введите только индекс").ToOutput(), this);
 
             deletePlace(index);
 
-            return ("Место удалено. Внимание, индексы мест могли сместиться".ToOutput(), null);
+            return (success.ToRandom().ToOutput(), null);
         }
 
         public IState Reset()

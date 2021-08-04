@@ -5,20 +5,24 @@
     public sealed class StartDeleteState : IState
     {
         private readonly IState next;
+        private readonly IWords keys;
+        private readonly IWords result;
 
-        public StartDeleteState(IState next)
+        public StartDeleteState(IWords keys, IWords result, IState next)
         {
             this.next = next;
+            this.keys = keys;
+            this.result = result;
         }
 
         public bool IsInput(Input input)
         {
-            return input.Message.Text?.Contains("delete") ?? false; // TODO : hardcode
+            return keys.Match(input.Message);
         }
 
         public (Output, IState) Process(Input input)
         {
-            return ("Введите номер места".ToOutput(), next); // TODO : hardcode
+            return (result.ToRandom().ToOutput(), next);
         }
 
         public IState Reset()

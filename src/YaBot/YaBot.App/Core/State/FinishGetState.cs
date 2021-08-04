@@ -9,10 +9,12 @@
     public sealed class FinishGetState : IState
     {
         private readonly Func<int, Place> getPlace;
+        private readonly IWords error;
 
-        public FinishGetState(Func<int, Place> getPlace)
+        public FinishGetState(IWords error, Func<int, Place> getPlace)
         {
             this.getPlace = getPlace;
+            this.error = error;
         }
 
         public bool IsInput(Input input)
@@ -25,7 +27,7 @@
             //TODO : validation
 
             if (int.TryParse(input.Message.Text, out var index).Not())
-                return ("Неправильный формат. Введите только индекс".ToOutput(), this);
+                return (error.ToError("Неправильный формат. Введите только индекс").ToOutput(), this);
 
             var place = getPlace(index);
 

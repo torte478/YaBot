@@ -5,26 +5,65 @@
     "dbg",
     "ya_rik_bot"
   ],
-  "StopWords": [
-    "достаточно",
-    "reset"
+  "Ping": [
+    "Звали меня?",
+    "Че надо?",
+    "?",
+    "Опять работа?"
   ],
-  "States": {
-    "Start": {
-      "WithName": true,
-      "Words": [
-        "куда",
-        "пойти",
-        "стартуем",
-        "start"
-      ]
-    },
-    "StartCreatePlace": {
-      "WithName": true,
-      "Words": [
-        "создай",
-        "create"
-      ]
-    }
-  }
+  "Auf": [
+    "Ауф!"
+  ],
+  "Reset": [
+    "достаточно",
+    "reset",
+    "хватит"
+  ],
+  "Error": [
+    "Ошибка!",
+    "Я сломался!",
+    "Неееееееееет!",
+    "Беда..."
+  ],
+  "StartCreatePlace_Keys": [
+    "create",
+    "добавь"
+  ],
+  "StartCreatePlace_Success": [
+    "Введите название места. Будет здорово, если вы прикрепите его фотографию"
+  ],
+  "FinishCreatePlace": [
+    "Новое место успешно добавлено"
+  ],
+  "ListState_Keys": [
+    "list",
+    "список"
+  ],
+  "ListState_Success": [
+    "Список мест:"
+  ],
+  "StartGetState_Keys": [
+    "get",
+    "покажи"
+  ],
+  "StartGetState_Success": [
+    "Введите номер места"
+  ],
+  "StartDeleteState_Keys": [
+    "delete",
+    "удали",
+    "удоли"
+  ],
+  "StartDeleteState_Success": [
+    "Введите номер места"
+  ],
+  "FinishDeleteState_Success": [
+    "Место удалено. Внимание, индексы мест могли сместиться"
+  ],
+  "GetRandomPlace": [
+    "куда",
+    "пойти",
+    "стартуем",
+    "getrandom"
+  ]
 }

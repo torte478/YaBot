@@ -8,11 +8,13 @@
     internal sealed class StartState : IState
     {
         private readonly IWords names;
+        private readonly IWords ping;
         private readonly ImmutableArray<IState> next;
 
-        public StartState(IWords names, ImmutableArray<IState> next)
+        public StartState(IWords names, IWords ping, ImmutableArray<IState> next)
         {
             this.names = names;
+            this.ping = ping;
             this.next = next;
         }
 
@@ -30,7 +32,7 @@
                    .FirstOrDefault(_ => _.IsInput(input))
                    ?._(_ => _.Process(input))
                ?? 
-               ("Звали меня?".ToOutput(), this); // TODO
+               (ping.ToRandom().ToOutput(), this);
         }
 
         public IState Reset()

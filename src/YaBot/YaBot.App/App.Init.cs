@@ -1,8 +1,8 @@
 ﻿namespace YaBot.App
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
-    using System.IO;
     using System.Linq;
     using System.Threading;
     using Configs;
@@ -23,38 +23,70 @@
         {
             var credentials = CredentialsPath
                 ._(File.ReadAllText)
-                ._(JsonConvert.DeserializeObject<Credentials>);
+                ._(JsonConvert.DeserializeObject<Credentials>)
+                ?? 
+                throw new Exception("Credentials is null");
 
-            var config = Config.Load(ConfigPath);
+            var config = ConfigPath
+                ._(File.ReadAllText)
+                ._(JsonConvert.DeserializeObject<Dictionary<string, string[]>>)
+                ?.ToDictionary(
+                    _ => _.Key,
+                    _ => _.Value._(Words.Create))
+                ?? 
+                throw new Exception("Config is null"); 
             
             var context = new Context(credentials.Database);
             
             var places = new Crudl<Place>(context, _ => _.Places);
+
+            var error = config["Error"];
             
             var startState = new StartState(
-                config.Names._(Words.Create),
+                config["Names"],
+                config["Ping"],
                 new IState[]
                 {
                     new StartCreatePlaceState(
-                        config.States["StartCreatePlace"].Words._(Words.Create),
+                        config["StartCreatePlace_Keys"],
+                        config["StartCreatePlace_Success"],
                         new FinishCreatePlaceState(
-                            _ => places.Create(_)) 
-                    ),
-                    new ListState(places.ToList),
+                            _ => places.Create(_),
+                            config["FinishCreatePlace"]) 
+                        ),
+                    new ListState(
+                        config["ListState_Keys"],
+                        config["ListState_Success"],
+                        places.ToList),
                     new StartGetState(
-                        new FinishGetState(places.Read)),
+                        config["StartGetState_Keys"],
+                        config["StartGetState_Success"],
+                        new FinishGetState(
+                            error,
+                            places.Read)
+                        ),
                     new StartDeleteState(
+                        config["StartDeleteState_Keys"],
+                        config["StartDeleteState_Success"],
                         new FinishDeleteState(
-                            _ => places.Delete(_))),
+                            error,
+                            config["FinishDeleteState_Success"],
+                            _ => places.Delete(_)
+                            )
+                        ),
                     new GetRandomPlaceState(
-                        config.States["Start"].Words._(Words.Create),
-                        places.ToList) // TODO : replace from init
+                        config["GetRandomPlace"],
+                        places.ToList)
                 }
                 .ToImmutableArray());
 
-            var stoppers = config.StopWords._(Words.Create);
-            
-            var bot = new Bot(createReceiver: () => new States(startState, stoppers, Log).Process,
+            var bot = new Bot(createReceiver: 
+                () => new States(
+                    startState, 
+                    config["Reset"],
+                config["Auf"],
+                    Log)
+                    .Process,
                 begin: DateTime.UtcNow); 
 
             var handler = new Handler(bot.ReceiveAsync, Log);

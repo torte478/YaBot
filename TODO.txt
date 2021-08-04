@@ -1,5 +1,6 @@
 уменьшить количество state-ов
 добавить команду статус и версию
+todo : rewrite tests (A<Fake> create and call)
 
 Ауф
 Вопрос - сущ
@@ -22,3 +23,5 @@ DI
 Бэкапы БД
 message.ToString()
 offline debug
+keywods duplicate validation
+fix public-internal

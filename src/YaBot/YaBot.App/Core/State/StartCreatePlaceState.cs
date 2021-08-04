@@ -5,11 +5,13 @@
     internal sealed class StartCreatePlaceState : IState
     {
         private readonly IWords keys;
+        private readonly IWords intro;
         private readonly IState next;
 
-        public StartCreatePlaceState(IWords keys, IState next)
+        public StartCreatePlaceState(IWords keys, IWords intro, IState next)
         {
             this.keys = keys;
+            this.intro = intro;
             this.next = next;
         }
 
@@ -21,7 +23,7 @@
         public (Output, IState) Process(Input input)
         {
             return (
-                "Введите название места. Будет здорово, если вы прикрепите его фотографию".ToOutput(), // TODO
+                intro.ToRandom().ToOutput(),
                 next);
         }
 

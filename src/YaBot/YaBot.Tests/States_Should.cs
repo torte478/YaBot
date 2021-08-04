@@ -22,7 +22,7 @@
             A.CallTo(() => start.Process(A<Input>._)).Returns(("start".ToOutput(), next));
             A.CallTo(() => next.Process(A<Input>._)).Returns(("next".ToOutput(), next));
 
-            var states = new States(start, stoppers, _ => { });
+            var states = new States(start, stoppers, A.Fake<IWords>(),_ => { });
 
             states.Process(changeState);
             states.Process(reset);

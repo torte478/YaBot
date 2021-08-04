@@ -10,15 +10,16 @@
     internal sealed class FinishCreatePlaceState : IState
     {
         private readonly Action<Place> savePlace;
+        private readonly IWords success;
         
-        public FinishCreatePlaceState(Action<Place> savePlace)
+        public FinishCreatePlaceState(Action<Place> savePlace, IWords success)
         {
             this.savePlace = savePlace;
+            this.success = success;
         }
 
         public bool IsInput(Input input)
         {
-            // TODO : is text with image
             return !input.Message.Text.IsNullOrEmpty()
                 || input.Message.Photo != null;
         }
@@ -31,7 +32,7 @@
                 ._(GetPlace)
                 ._(savePlace);
 
-            return ("Новое место сохранено".ToOutput(), null); // (TODO, TODO)
+            return (success.ToRandom().ToOutput(), null); // (_, TODO)
         }
 
         public IState Reset()

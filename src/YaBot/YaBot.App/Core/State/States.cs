@@ -8,15 +8,17 @@
     {
         private readonly IState start;
         private readonly IWords stoppers;
+        private readonly IWords auf;
         private readonly Action<string> log;
 
         private IState current;
 
-        public States(IState start, IWords stoppers, Action<string> log)
+        public States(IState start, IWords stoppers, IWords auf, Action<string> log)
         {
             this.start = start;
             this.stoppers = stoppers;
             this.log = log;
+            this.auf = auf;
 
             current = start;
         }
@@ -28,7 +30,7 @@
             {
                 current.Reset();
                 current = start;
-                return "Ауф!".ToOutput(); // TODO
+                return auf.ToRandom().ToOutput();
             }
             
             var (answer, next) = current.Process(input);
