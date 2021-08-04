@@ -2,7 +2,7 @@
 
 namespace YaBot.App.Core.Database
 {
-    public partial class Place
+    public partial class Place : IHasId<int>
     {
         public int Id { get; set; }
         public string Name { get; set; }

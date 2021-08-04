@@ -1,5 +1,6 @@
 ﻿namespace YaBot.App.Core.State
 {
+    using System;
     using System.IO;
     using System.Linq;
     using Castle.Core.Internal;
@@ -8,11 +9,11 @@
 
     internal sealed class FinishCreatePlaceState : IState
     {
-        private readonly Context context; // TODO : to interface
-
-        public FinishCreatePlaceState(Context context)
+        private readonly Action<Place> savePlace;
+        
+        public FinishCreatePlaceState(Action<Place> savePlace)
         {
-            this.context = context;
+            this.savePlace = savePlace;
         }
 
         public bool IsInput(Input input)
@@ -28,8 +29,7 @@
             
             input
                 ._(GetPlace)
-                ._(context.Places.Add)
-                ._(_ => context.SaveChanges());
+                ._(savePlace);
 
             return ("Новое место сохранено".ToOutput(), null); // (TODO, TODO)
         }

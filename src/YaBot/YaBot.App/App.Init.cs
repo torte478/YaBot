@@ -33,31 +33,26 @@
             
             var context = new Context(credentials.Database);
             
+            var places = new Crudl<Place>(context, _ => _.Places);
+            
             var startState = new StartState(
                 config.Names._(Words.Create),
                 new IState[]
                 {
                     new StartCreatePlaceState(
                         config.States["StartCreatePlace"].Words._(Words.Create),
-                        new FinishCreatePlaceState(context) 
+                        new FinishCreatePlaceState(
+                            _ => places.Create(_)) 
                     ),
-                    new ListState(
-                        () => context.Places), // TODO : replace from init
+                    new ListState(places.ToList),
                     new StartGetState(
-                        new FinishGetState(
-                            _ => context.Places.ToList()[_])), // TODO : replace from init
+                        new FinishGetState(places.Read)),
                     new StartDeleteState(
                         new FinishDeleteState(
-                            _ =>
-                            {
-                                // TODO : replace from init
-                                var place = context.Places.ToList()[_];
-                                context.Places.Remove(place);
-                                context.SaveChanges();
-                            })),
+                            _ => places.Delete(_))),
                     new GetRandomPlaceState(
                         config.States["Start"].Words._(Words.Create),
-                        () => context.Places) // TODO : replace from init
+                        places.ToList) // TODO : replace from init
                 }
                 .ToImmutableArray());
 
