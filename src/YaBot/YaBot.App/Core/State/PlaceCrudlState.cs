@@ -26,101 +26,7 @@
         public bool IsInput(Input input)
         {
             return state != State.Start
-                   || keys.Match(input.Message) != null;
-        }
-
-        public (Output, IState) Process(Input input)
-        {
-            if (state == State.Start)
-            {
-                var match = keys.Match(input.Message);
-                if (match == keys.Create)
-                {
-                    state = State.Create;
-                    return (keys.Create.Start.ToRandomOutput(), this);
-                }
-                if (match == keys.Read)
-                {
-                    state = State.Read;
-                    return (keys.Read.Start.ToRandomOutput(), this);
-                }
-                if (match == keys.Delete)
-                {
-                    state = State.Delete;
-                    return (keys.Delete.Start.ToRandomOutput(), this);
-                }
-
-                if (match == keys.List)
-                {
-                    var list = places
-                        .ToList()
-                        .Select(_ => _.Name)
-                        .ToList()
-                        .Select((x, i) => $"{i}. {x}")
-                        .Aggregate(
-                            new StringBuilder().AppendLine(keys.List.Success.ToRandom()),
-                            (acc, x) => acc.AppendLine(x))
-                        .ToString()
-                        .ToOutput();
-            
-                    // TODO : pagination
-
-                    return (list, null);
-                }
-
-                return (keys.Error.ToError("Не удалось выйти из начального состояния").ToOutput(), null);
-            }
-
-            if (state == State.Create)
-            {
-                // TODO : null validators
-            
-                input
-                    ._(GetPlace)
-                    ._(places.Create);
-
-                Reset();
-                
-                return (keys.Create.Success.ToRandomOutput(), null); // (_, TODO)       
-            }
-
-            if (state == State.Read)
-            {
-                //TODO : validation
-
-                if (int.TryParse(input.Message.Text, out var index).Not())
-                    return (keys.Error.ToError("Неправильный формат. Введите только индекс").ToOutput(), this);
-
-                var place = places.Read(index);
-
-                Reset();
-
-                if (place.Image == null)
-                    return (place.Name.ToOutput(), null);
-
-                var stream = new MemoryStream(place.Image);
-                var answer = new Output
-                {
-                    Text = place.Name,
-                    Image = new InputOnlineFile(stream) // TODO : refactor Telegram.Bot.Api using
-                };
-                return (answer, null);
-            }
-
-            if (state == State.Delete)
-            {
-                //TODO : validation
-
-                if (int.TryParse(input.Message.Text, out var index).Not())
-                    return (keys.Error.ToError("Неправильный формат. Введите только индекс").ToOutput(), this);
-
-                places.Delete(index);
-
-                Reset();
-                return (keys.Delete.Success.ToRandomOutput(), null);
-            }
-            
-            return (keys.Error.ToError("Неизвестное состояние").ToOutput(), null);
+                   || Match(input.Message) != State.Unknown;
         }
 
         public IState Reset()
@@ -128,7 +34,105 @@
             state = State.Start;
             return this;
         }
-        
+
+        public (Output, IState) Process(Input input)
+        {
+            return state switch
+            {
+                State.Start => StartOperation(input),
+                State.Create => RunCreate(input),
+                State.Read => RunRead(input),
+                State.Delete => RunDelete(input),
+                _ => (keys.Error.ToError("Неизвестное состояние").ToOutput(), null)
+            };
+        }
+
+        private (Output, IState) StartOperation(Input input)
+        {
+            return Match(input.Message) switch
+            {
+                State.Create => StartOperation(keys.Create, State.Create),
+                State.Read => StartOperation(keys.Read, State.Read),
+                State.Delete => StartOperation(keys.Delete, State.Delete),
+                State.List => RunList(),
+                _ => (keys.Error.ToError("Не удалось выйти из начального состояния").ToOutput(), null) 
+            };
+        }
+
+        private (Output, IState) RunDelete(Input input)
+        {
+            //TODO : validation
+
+            if (int.TryParse(input.Message.Text, out var index).Not())
+                return (keys.Error.ToError("Неправильный формат. Введите только индекс").ToOutput(), this);
+
+            var place = places.Enumerate().ToList()[index];
+            places.Delete(place.Id);
+
+            Reset();
+            return (keys.Delete.Success.ToRandomOutput(), null);
+        }
+
+        private (Output, IState) RunRead(Input input)
+        {
+            //TODO : validation
+
+            if (int.TryParse(input.Message.Text, out var index).Not())
+                return (keys.Error.ToError("Неправильный формат. Введите только индекс").ToOutput(), this);
+
+            var place = places.Enumerate().ToList()[index];
+
+            Reset();
+
+            if (place.Image == null)
+                return (place.Name.ToOutput(), null);
+
+            var stream = new MemoryStream(place.Image);
+            var answer = new Output
+            {
+                Text = place.Name,
+                Image = new InputOnlineFile(stream) // TODO : refactor Telegram.Bot.Api using
+            };
+            return (answer, null);
+        }
+
+        private (Output, IState) RunCreate(Input input)
+        {
+            // TODO : null validators
+
+            input
+                ._(GetPlace)
+                ._(places.Create);
+
+            Reset();
+
+            return (keys.Create.Success.ToRandomOutput(), null); // (_, TODO)       
+        }
+
+        private (Output, IState) StartOperation(StateKeys key, State next)
+        {
+            state = next;
+            return (key.Start.ToRandomOutput(), this);
+        }
+
+        private (Output, IState) RunList()
+        {
+            var list = places
+                .Enumerate()
+                .Select(_ => _.Name)
+                .ToList()
+                .Select((x, i) => $"{i}. {x}")
+                .Aggregate(
+                    new StringBuilder().AppendLine(keys.List.Success.ToRandom()),
+                    (acc, x) => acc.AppendLine(x))
+                .ToString()
+                .ToOutput();
+            
+            // TODO : pagination
+
+            return (list, null); // TODO : null
+        }
+
         private static Place GetPlace(Input input)
         {
             if (input.Message.Photo == null)
@@ -148,13 +152,32 @@
             };
         }
 
+        private State Match(Message message)
+        {
+            if (keys.Create?.Keys.Match(message) ?? false)
+                return State.Create;
+
+            if (keys.Read?.Keys.Match(message) ?? false)
+                return State.Read;
+                
+            if (keys.Delete?.Keys.Match(message) ?? false)
+                return State.Delete;
+                
+            if (keys.List?.Keys.Match(message) ?? false)
+                return State.List;
+
+            return State.Unknown;
+        }
+        
         private enum State
         {
+            Unknown,
             Start,
 
             Create,
             Read,
-            Delete
+            Delete,
+            List
         }
 
         public sealed class Keys
@@ -165,18 +188,6 @@
             public StateKeys List { get; set; }
             
             public IWords Error { get; set; }
-
-            public StateKeys Match(Message message)
-            {
-                return new[]
-                    {
-                        Create,
-                        Read,
-                        Delete,
-                        List
-                    }
-                    .FirstOrDefault(_ => _?.Keys.Match(message) ?? false); // TODO : null
-            }
         }
 
         public sealed class StateKeys

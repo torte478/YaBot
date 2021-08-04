@@ -8,6 +8,6 @@
         TValue Read(TKey key);
         bool Update(TValue value);
         bool Delete(TKey key);
-        IEnumerable<TValue> ToList();
+        IEnumerable<TValue> Enumerate();
     }
 }

@@ -63,7 +63,7 @@
             return item != null;
         }
 
-        public IEnumerable<T> ToList()
+        public IEnumerable<T> Enumerate()
         {
             return context._(getEntities);
         }

@@ -78,7 +78,7 @@
                         ),
                     new GetRandomPlaceState(
                         config["GetRandomPlace"],
-                        places.ToList)
+                        places.Enumerate)
                 }
                 .ToImmutableArray());
 
