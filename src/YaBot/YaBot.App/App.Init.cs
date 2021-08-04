@@ -47,32 +47,34 @@
                 config["Ping"],
                 new IState[]
                 {
-                    new StartCreatePlaceState(
-                        config["StartCreatePlace_Keys"],
-                        config["StartCreatePlace_Success"],
-                        new FinishCreatePlaceState(
-                            _ => places.Create(_),
-                            config["FinishCreatePlace"]) 
-                        ),
-                    new ListState(
-                        config["ListState_Keys"],
-                        config["ListState_Success"],
-                        places.ToList),
-                    new StartGetState(
-                        config["StartGetState_Keys"],
-                        config["StartGetState_Success"],
-                        new FinishGetState(
-                            error,
-                            places.Read)
-                        ),
-                    new StartDeleteState(
-                        config["StartDeleteState_Keys"],
-                        config["StartDeleteState_Success"],
-                        new FinishDeleteState(
-                            error,
-                            config["FinishDeleteState_Success"],
-                            _ => places.Delete(_)
-                            )
+                    new PlaceCrudlState(
+                        new PlaceCrudlState.Keys
+                        {
+                            Create = new PlaceCrudlState.StateKeys
+                            {   
+                                Keys = config["PlaceCrudlState_Create_Keys"],
+                                Start = config["PlaceCrudlState_Create_Start"],
+                                Success = config["PlaceCrudlState_Create_Success"]
+                            },
+                            Read = new PlaceCrudlState.StateKeys
+                            {
+                                Keys = config["PlaceCrudlState_Read_Keys"],
+                                Start = config["PlaceCrudlState_Read_Start"]
+                            },
+                            Delete = new PlaceCrudlState.StateKeys
+                            {
+                                Keys = config["PlaceCrudlState_Delete_Keys"],
+                                Start = config["PlaceCrudlState_Delete_Start"],
+                                Success = config["PlaceCrudlState_Delete_Success"] 
+                            },
+                            List =  new PlaceCrudlState.StateKeys
+                            {
+                                Keys = config["PlaceCrudlState_List_Keys"],
+                                Success = config["PlaceCrudlState_List_Success"] 
+                            },
+                            Error = error
+                        },
+                        places
                         ),
                     new GetRandomPlaceState(
                         config["GetRandomPlace"],

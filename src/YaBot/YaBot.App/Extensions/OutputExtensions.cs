@@ -8,5 +8,10 @@
         {
             return new() {Text = text};
         }
+
+        public static Output ToRandomOutput(this IWords words)
+        {
+            return words.ToRandom().ToOutput();
+        }
     }
 }

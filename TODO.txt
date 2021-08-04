@@ -1,4 +1,5 @@
 уменьшить количество state-ов
+immutable states
 добавить команду статус и версию
 todo : rewrite tests (A<Fake> create and call)
 
@@ -25,3 +26,5 @@ message.ToString()
 offline debug
 keywods duplicate validation
 fix public-internal
+strings to resources
+экстренное выключение

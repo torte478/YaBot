@@ -25,39 +25,39 @@
     "Неееееееееет!",
     "Беда..."
   ],
-  "StartCreatePlace_Keys": [
+  "PlaceCrudlState_Create_Keys": [
     "create",
     "добавь"
   ],
-  "StartCreatePlace_Success": [
+  "PlaceCrudlState_Create_Start": [
     "Введите название места. Будет здорово, если вы прикрепите его фотографию"
   ],
-  "FinishCreatePlace": [
+  "PlaceCrudlState_Create_Success": [
     "Новое место успешно добавлено"
   ],
-  "ListState_Keys": [
+  "PlaceCrudlState_List_Keys": [
     "list",
     "список"
   ],
-  "ListState_Success": [
+  "PlaceCrudlState_List_Success": [
     "Список мест:"
   ],
-  "StartGetState_Keys": [
+  "PlaceCrudlState_Read_Keys": [
     "get",
     "покажи"
   ],
-  "StartGetState_Success": [
+  "PlaceCrudlState_Read_Start": [
     "Введите номер места"
   ],
-  "StartDeleteState_Keys": [
+  "PlaceCrudlState_Delete_Keys": [
     "delete",
     "удали",
     "удоли"
   ],
-  "StartDeleteState_Success": [
+  "PlaceCrudlState_Delete_Start": [
     "Введите номер места"
   ],
-  "FinishDeleteState_Success": [
+  "PlaceCrudlState_Delete_Success": [
     "Место удалено. Внимание, индексы мест могли сместиться"
   ],
   "GetRandomPlace": [

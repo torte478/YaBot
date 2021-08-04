@@ -17,5 +17,15 @@
             
             Assert.That(actual, Is.EqualTo(string.Empty));
         }
+
+        [Test]
+        public void ReturnEmptyString_WhenWordsIsNull()
+        {
+            IWords words = null;
+
+            var actual = words.ToRandom();
+            
+            Assert.That(actual, Is.EqualTo(string.Empty));
+        }
     }
 }

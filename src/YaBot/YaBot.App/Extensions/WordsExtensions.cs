@@ -10,6 +10,9 @@
 
         public static string ToRandom(this IWords words)
         {
+            if (words == null)
+                return string.Empty;
+            
             var variants = words.ToList();
 
             return variants.Count > 0
