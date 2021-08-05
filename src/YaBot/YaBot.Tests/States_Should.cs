@@ -3,6 +3,7 @@
     using App.Core;
     using App.Core.State;
     using App.Extensions;
+    using App.TelegramApi;
     using FakeItEasy;
     using NUnit.Framework;
 
@@ -15,19 +16,24 @@
             var start = A.Fake<IState>();
             var next = A.Fake<IState>();
             var stoppers = A.Fake<IWords>();
-            var changeState = A.Fake<Input>();
-            var reset = A.Fake<Input>();
+            var changeState = A.Fake<IInput>();
+            var reset = A.Fake<IInput>();
 
-            A.CallTo(() => stoppers.Match(reset.Message)).Returns(true);
-            A.CallTo(() => start.Process(A<Input>._)).Returns(("start".ToOutput(), next));
-            A.CallTo(() => next.Process(A<Input>._)).Returns(("next".ToOutput(), next));
+            A.CallTo(() => stoppers.Match(reset.Text)).Returns(true);
+            A.CallTo(() => start.Process(A<IInput>._)).Returns(("start"._(Output.Create), next));
+            A.CallTo(() => next.Process(A<IInput>._)).Returns(("next"._(Output.Create), next));
 
-            var states = new States(start, stoppers, A.Fake<IWords>(),_ => { });
+            var states = new States(
+                start, 
+                stoppers, 
+                A.Fake<IWords>(),
+                Output.Create,
+                _ => { });
 
             states.Process(changeState);
             states.Process(reset);
             
-            Assert.That(states.Process(A.Fake<Input>()).Text, Is.EqualTo("start"));
+            Assert.That(states.Process(A.Fake<IInput>()).Text, Is.EqualTo("start"));
         }
     }
 }

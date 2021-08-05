@@ -2,54 +2,31 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Extensions;
-    using Telegram.Bot;
-    using Telegram.Bot.Types;
 
     public sealed class Bot
     {
-        private readonly Func<Func<Input, Output>> createReceiver;
+        private readonly Func<Func<IInput, IOutput>> createReceiver;
         private readonly DateTime begin;
 
-        private readonly Dictionary<long, Func<Input, Output>> chats = new();
+        private readonly Dictionary<long, Func<IInput, IOutput>> process = new();
 
-        public Bot(Func<Func<Input, Output>> createReceiver, DateTime begin)
+        public Bot(Func<Func<IInput, IOutput>> createReceiver, DateTime begin)
         {
             this.createReceiver = createReceiver;
             this.begin = begin;
         }
 
-        public async Task ReceiveAsync(ITelegramBotClient client, Update update, CancellationToken cancellation)
+        public IOutput Receive(IInput input)
         {
-            if (update.Message.Date < begin)
-                return;
+            if (input.Date < begin)
+                return null;
             
             try
             {
-                var id = update.Message.Chat.Id;
-                
-                if (!chats.ContainsKey(id))
-                    chats.Add(id, createReceiver());
+                if (!process.ContainsKey(input.Chat))
+                    process.Add(input.Chat, createReceiver());
 
-                var answer = new Input
-                {
-                    Client = client,
-                    Message = update.Message
-                }
-                    ._(chats[id]);
-                    
-                if (answer.Text._(string.IsNullOrEmpty))
-                    await Task.CompletedTask;
-                else if (answer.Image != null)
-                {
-                    await client.SendPhotoAsync(update.Message.Chat, answer.Image, answer.Text,
-                        cancellationToken: cancellation);
-                    answer.Image.Content.Dispose();
-                }
-                else
-                    await client.SendTextMessageAsync(update.Message.Chat, answer.Text, cancellationToken: cancellation);
+                return process[input.Chat](input);
             }
             catch (Exception e)
             {

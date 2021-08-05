@@ -1,12 +1,10 @@
 ﻿namespace YaBot.App.Core.State
 {
-    using System.IO;
+    using System;
     using System.Linq;
     using System.Text;
     using Database;
     using Extensions;
-    using Telegram.Bot.Types;
-    using Telegram.Bot.Types.InputFiles;
 
     public sealed class PlaceCrudlState : IState
     {
@@ -14,21 +12,32 @@
         
         private readonly Keys keys;
         private readonly ICrudl<int, Place> places;
+        private readonly Func<IWords, IOutput> toOutput;
+        private readonly Func<string, IOutput> toStringOutput;
+        private readonly Func<Place, IOutput> toImageOutput;
         
         private State state;
         
-        public PlaceCrudlState(Keys keys, ICrudl<int, Place> places)
+        public PlaceCrudlState(
+            Keys keys, 
+            ICrudl<int, Place> places, 
+            Func<IWords, IOutput> toOutput, 
+            Func<string, IOutput> toStringOutput, 
+            Func<Place, IOutput> toImageOutput)
         {
             this.keys = keys;
             this.places = places;
+            this.toOutput = toOutput;
+            this.toStringOutput = toStringOutput;
+            this.toImageOutput = toImageOutput;
 
             state = State.Start;
         }
 
-        public bool IsInput(Input input)
+        public bool IsInput(IInput input)
         {
             return state != State.Start
-                   || Match(input.Message) != State.Unknown;
+                   || Match(input.Text) != State.Unknown;
         }
 
         public IState Reset()
@@ -37,7 +46,7 @@
             return this;
         }
 
-        public (Output, IState) Process(Input input)
+        public (IOutput, IState) Process(IInput input)
         {
             return state switch
             {
@@ -45,45 +54,45 @@
                 State.Create => RunCreate(input),
                 State.Read => RunRead(input),
                 State.Delete => RunDelete(input),
-                _ => (keys.Error.ToError("Неизвестное состояние").ToOutput(), null)
+                _ => (keys.Error.ToError("Неизвестное состояние")._(toStringOutput), null)
             };
         }
 
-        private (Output, IState) StartOperation(Input input)
+        private (IOutput, IState) StartOperation(IInput input)
         {
-            return Match(input.Message) switch
+            return Match(input.Text) switch
             {
                 State.Create => StartOperation(keys.Create, State.Create),
                 State.Read => StartOperation(keys.Read, State.Read),
                 State.Delete => StartOperation(keys.Delete, State.Delete),
                 State.List => RunList(),
-                _ => (keys.Error.ToError("Не удалось выйти из начального состояния").ToOutput(), null) 
+                _ => (keys.Error.ToError("Не удалось выйти из начального состояния")._(toStringOutput), null) 
             };
         }
 
-        private (Output, IState) RunDelete(Input input)
+        private (IOutput, IState) RunDelete(IInput input)
         {
-            var (index, error) = TryParseIndex(input.Message);
+            var (index, error) = TryParseIndex(input.Text);
             if (index == Undefined)
-                return (keys.Error.ToError(error).ToOutput(), this);
+                return (keys.Error.ToError(error)._(toStringOutput), this);
 
             var place = places.Enumerate().ToList()[index];
             places.Delete(place.Id);
 
             Reset();
-            return (keys.Delete.Success.ToRandomOutput(), null);
+            return (keys.Delete.Success._(toOutput), null);
         }
 
-        private (int, string) TryParseIndex(Message message)
+        private (int, string) TryParseIndex(string text)
         {
-            if (message.Text == null)
+            if (text == null)
                 return (Undefined, "Необходимо ввести текстовое сообщение");
 
             var list = places.Enumerate().ToList();
             var min = 0;
             var max = list.Count - 1;
             
-            if (int.TryParse(message.Text, out var index).Not()
+            if (int.TryParse(text, out var index).Not()
                 || index < min
                 || index > max)
                 return (Undefined, $"Неправильный формат. Нужно ввести число в диапазоне {min} - {max}");
@@ -91,29 +100,20 @@
             return (index, null);
         }
 
-        private (Output, IState) RunRead(Input input)
+        private (IOutput, IState) RunRead(IInput input)
         {
-            var (index, error) = TryParseIndex(input.Message);
+            var (index, error) = TryParseIndex(input.Text);
             if (index == Undefined)
-                return (keys.Error.ToError(error).ToOutput(), this);
+                return (keys.Error.ToError(error)._(toStringOutput), this);
 
             var place = places.Enumerate().ToList()[index];
 
             Reset();
 
-            if (place.Image == null)
-                return (place.Name.ToOutput(), null);
-
-            var stream = new MemoryStream(place.Image);
-            var answer = new Output
-            {
-                Text = place.Name,
-                Image = new InputOnlineFile(stream) // TODO : refactor Telegram.Bot.Api using
-            };
-            return (answer, null);
+            return (toImageOutput(place), null);
         }
 
-        private (Output, IState) RunCreate(Input input)
+        private (IOutput, IState) RunCreate(IInput input)
         {
             // TODO : null validators
 
@@ -123,16 +123,16 @@
 
             Reset();
 
-            return (keys.Create.Success.ToRandomOutput(), null); // (_, TODO)       
+            return (keys.Create.Success._(toOutput), null); // (_, TODO)       
         }
 
-        private (Output, IState) StartOperation(StateKeys key, State next)
+        private (IOutput, IState) StartOperation(StateKeys key, State next)
         {
             state = next;
-            return (key.Start.ToRandomOutput(), this);
+            return (key.Start._(toOutput), this);
         }
 
-        private (Output, IState) RunList()
+        private (IOutput, IState) RunList()
         {
             var list = places
                 .Enumerate()
@@ -143,33 +143,24 @@
                     new StringBuilder().AppendLine(keys.List.Success.ToRandom()),
                     (acc, x) => acc.AppendLine(x))
                 .ToString()
-                .ToOutput();
+                ._(toStringOutput);
             
             // TODO : pagination
 
             return (list, null); // TODO : null
         }
 
-        private static Place GetPlace(Input input)
+        private static Place GetPlace(IInput input)
         {
-            if (input.Message.Photo == null)
-                return new Place { Name = input.Message.Text };
+            var place = new Place { Name = input.Text };
             
-            var photo = input.Message.Photo
-                .OrderByDescending(_ => _.Width * _.Height)
-                .First();
-                
-            using var stream = new MemoryStream();
-            input.Client.GetInfoAndDownloadFileAsync(photo.FileId, stream).Wait(); // TODO : to async
-
-            return new Place
-            {
-                Name = input.Message.Caption,
-                Image = stream.ToArray()
-            };
+            if (input.IsImage)
+                place.Image = input.Image;
+            
+            return place;
         }
 
-        private State Match(Message message)
+        private State Match(string message)
         {
             if (keys.Create?.Keys.Match(message) ?? false)
                 return State.Create;

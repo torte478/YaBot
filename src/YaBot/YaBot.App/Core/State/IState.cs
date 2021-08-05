@@ -2,8 +2,8 @@
 {
     public interface IState
     {
-        bool IsInput(Input input);
-        (Output, IState) Process(Input input);
+        bool IsInput(IInput input);
+        (IOutput, IState) Process(IInput input);
         IState Reset();
     }
 }

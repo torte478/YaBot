@@ -2,10 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using Database;
     using Extensions;
-    using Telegram.Bot.Types.InputFiles;
 
     public sealed class GetRandomPlaceState : IState
     {
@@ -13,45 +11,31 @@
         
         private readonly IWords keys;
         private readonly Func<IEnumerable<Place>> getPlaces;
+        private readonly Func<Place, IOutput> toOutput;
 
         private readonly List<Place> places = new();
         private int index = 0;
 
-        public GetRandomPlaceState(IWords keys, Func<IEnumerable<Place>> getPlaces)
+        public GetRandomPlaceState(IWords keys, Func<IEnumerable<Place>> getPlaces, Func<Place, IOutput> toOutput)
         {
             this.keys = keys;
             this.getPlaces = getPlaces;
+            this.toOutput = toOutput;
         }
 
-        public bool IsInput(Input input)
+        public bool IsInput(IInput input)
         {
-            return keys.Match(input.Message);
+            return keys.Match(input.Text);
         }
 
-        public (Output, IState) Process(Input input)
+        public (IOutput, IState) Process(IInput input)
         {
             if (index >= places.Count)
                 ReloadPlaces();
 
             var place = places[index++];
 
-            return place._(ToAnswer);
-        }
-
-        private (Output, IState) ToAnswer(Place place)
-        {
-            //TODO : GetState duplicate
-            
-            if (place.Image == null)
-                return (place.Name.ToOutput(), this);
-
-            var stream = new MemoryStream(place.Image);
-            var answer = new Output
-            {
-                Text = place.Name,
-                Image = new InputOnlineFile(stream) // TODO : refactor Telegram.Bot.Api using
-            };
-            return (answer, this);
+            return (place._(toOutput), this);
         }
 
         public IState Reset()

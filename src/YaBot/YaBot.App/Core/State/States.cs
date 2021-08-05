@@ -2,38 +2,44 @@
 {
     using System;
     using Extensions;
-    using Telegram.Bot.Types;
 
     public sealed class States
     {
         private readonly IState start;
         private readonly IWords stoppers;
         private readonly IWords auf;
+        private readonly Func<IWords, IOutput> toOutput;
         private readonly Action<string> log;
 
         private IState current;
 
-        public States(IState start, IWords stoppers, IWords auf, Action<string> log)
+        public States(
+            IState start, 
+            IWords stoppers, 
+            IWords auf, 
+            Func<IWords, IOutput> toOutput, 
+            Action<string> log)
         {
             this.start = start;
             this.stoppers = stoppers;
-            this.log = log;
             this.auf = auf;
+            this.toOutput = toOutput;
+            this.log = log;
 
             current = start;
         }
 
-        public Output Process(Input input)
+        public IOutput Process(IInput input)
         {
-            var reset = current != start && stoppers.Match(input.Message); 
+            var reset = current != start && stoppers.Match(input.Text); 
             if (reset)
             {
                 current.Reset();
                 current = start;
-                return auf.ToRandom().ToOutput();
+                return auf._(toOutput);
             }
             
-            var (answer, next) = current.Process(input);
+            var (answer, next) =  current.Process(input);
 
             next ??= start;
             

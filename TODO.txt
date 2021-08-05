@@ -1,7 +1,6 @@
 уменьшить количество state-ов
 immutable states
 добавить команду статус и версию
-todo : rewrite tests (A<Fake> create and call)
 
 Ауф
 Вопрос - сущ

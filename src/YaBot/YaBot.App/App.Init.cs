@@ -12,6 +12,7 @@
     using Extensions;
     using Newtonsoft.Json;
     using Telegram.Bot;
+    using TelegramApi;
     using File = System.IO.File;
 
     internal partial class App
@@ -74,24 +75,32 @@
                             },
                             Error = error
                         },
-                        places
+                        places,
+                        //TODO : to factory
+                        Output.Create,
+                        Output.Create,
+                        Output.Create
                         ),
                     new GetRandomPlaceState(
                         config["GetRandomPlace"],
-                        places.Enumerate)
+                        places.Enumerate,
+                        Output.Create)
                 }
-                .ToImmutableArray());
+                .ToImmutableArray(),
+                Output.Create);
+
+            States CreateStates() => new States(
+                startState, 
+                config["Reset"],
+                config["Auf"],
+                Output.Create,
+                Log);
 
             var bot = new Bot(createReceiver: 
-                () => new States(
-                    startState, 
-                    config["Reset"],
-                config["Auf"],
-                    Log)
-                    .Process,
+                () => CreateStates().Process,
                 begin: DateTime.UtcNow); 
 
-            var handler = new Handler(bot.ReceiveAsync, Log);
+            var handler = new Handler(Input.CreateAsync, bot.Receive, Log);
 
             return new App(
                 new TelegramBotClient(credentials.Telegram),
