@@ -1,4 +1,4 @@
-﻿namespace YaBot.App.Core
+﻿namespace YaBot.App.Core.Outputs
 {
     using Extensions;
 
@@ -8,6 +8,7 @@
         public string Text { get; init; }
         
         public bool IsImage => Image != null;
-        public bool IsText => string.IsNullOrEmpty(Text).Not();
+        public bool IsText => IsImage.Not()
+                              && string.IsNullOrEmpty(Text).Not();
     }
 }

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using Outputs;
 
     public sealed class Bot
     {

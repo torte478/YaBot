@@ -2,6 +2,7 @@
 {
     using System;
     using Extensions;
+    using Outputs;
 
     public sealed class States
     {

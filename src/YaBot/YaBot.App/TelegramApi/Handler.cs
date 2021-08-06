@@ -5,6 +5,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Core;
+    using Core.Outputs;
     using Extensions;
     using Telegram.Bot;
     using Telegram.Bot.Extensions.Polling;

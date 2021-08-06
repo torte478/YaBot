@@ -4,6 +4,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using App.Core;
+    using App.Core.Outputs;
     using App.TelegramApi;
     using FakeItEasy;
     using NUnit.Framework;

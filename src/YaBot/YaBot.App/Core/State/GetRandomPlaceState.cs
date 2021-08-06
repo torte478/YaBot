@@ -5,6 +5,7 @@
     using System.Linq;
     using Database;
     using Extensions;
+    using Outputs;
 
     public sealed class GetRandomPlaceState : IState
     {

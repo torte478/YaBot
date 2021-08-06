@@ -3,6 +3,7 @@
     using System;
     using System.Text;
     using Extensions;
+    using Outputs;
 
     internal class StatusState : IState
     {

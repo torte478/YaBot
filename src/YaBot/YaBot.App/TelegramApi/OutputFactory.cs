@@ -2,6 +2,7 @@
 {
     using Core;
     using Core.Database;
+    using Core.Outputs;
     using Extensions;
 
     public sealed class OutputFactory : IOutputFactory<string, IWords, Place>
