@@ -59,6 +59,8 @@
             context
                 ._(getEntities)
                 .Remove(item);
+
+            context.SaveChanges();
             
             return item != null;
         }
