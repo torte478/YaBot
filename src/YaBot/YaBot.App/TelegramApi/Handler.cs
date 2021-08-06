@@ -32,20 +32,20 @@
             this.toInputAsync = toInputAsync;
         }
 
-        public Task HandleUpdate(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
             if (update?.Message == null)
-                return Task.CompletedTask;
+                return;
 
             log($"=> {update.Message?.Text ?? "?"}");
 
             var output = toInputAsync(botClient, update, cancellationToken).Result
                 ._(receive);
 
-            return SendAsync(botClient, update.Message.Chat, output, cancellationToken);
+            await SendAsync(botClient, update.Message.Chat, output, cancellationToken);
         }
 
-        public Task HandleError(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
             return exception
                 ._(_ => _.ToString()._(log))
@@ -59,7 +59,7 @@
             
             if (output.IsImage)
             {
-                using var stream = new MemoryStream(output.Image);
+                await using var stream = new MemoryStream(output.Image);
                 await client.SendPhotoAsync(
                     chat, 
                     new InputOnlineFile(stream),

@@ -105,7 +105,7 @@
             return new App(
                 new TelegramBotClient(credentials.Telegram),
                 new CancellationTokenSource(),
-                (client, cancellation) => client.ReceiveAsync(handler, cancellation),
+                (client, cancellation) => client.ReceiveAsync(handler, cancellationToken: cancellation),
                 context,
                 Log);
         }

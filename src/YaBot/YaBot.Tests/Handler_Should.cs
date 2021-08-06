@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using App.Core;
     using App.TelegramApi;
+    using FakeItEasy;
     using NUnit.Framework;
     using Telegram.Bot.Types;
 
@@ -12,13 +13,13 @@
     internal sealed class Handler_Should
     {
         [Test]
-        public void AllowUpdate_WhenTypeIsNotText()
+        public async Task AllowUpdate_WhenTypeIsNotText()
         {
             var called = false;
             var handler = Create(_ => { called = true; return null; });
             var update = new Update { Message = new Message() };
 
-            handler.HandleUpdate(null, update, new CancellationToken()).Wait();
+            await handler.HandleUpdateAsync(null, update, new CancellationToken());
 
             Assert.That(called, Is.True);
         }
@@ -28,19 +29,17 @@
         {
             var handler = Create(null);
 
-            Assert.DoesNotThrow(() =>
-            {
-                handler.HandleUpdate(null, new Update(), new CancellationToken()).Wait();
-            });
+            Assert.DoesNotThrowAsync(() => 
+                handler.HandleUpdateAsync(null, new Update(), new CancellationToken()));
         }
 
         [Test]
-        public void IgnoreMessage_WhenItIsNull()
+        public async Task IgnoreMessage_WhenItIsNull()
         {
             var called = false;
             var handler = Create(_ => { called = true; return null; });
 
-            handler.HandleUpdate(null, new Update(), new CancellationToken()).Wait();
+            await handler.HandleUpdateAsync(null, new Update(), new CancellationToken());
 
             Assert.That(called, Is.False);
         }
@@ -48,7 +47,7 @@
         private static Handler Create(Func<IInput, IOutput> receive)
         {
             return new Handler(
-                (_, _, _) => null,
+                (_, _, _) => Task.Run(A.Fake<IInput>),
                 receive,
                 _ => { }
             );

@@ -1,4 +1,4 @@
-уменьшить количество state-ов
+TODO's
 immutable states
 добавить команду статус и версию
 
@@ -29,3 +29,4 @@ strings to resources
 экстренное выключение
 crud.delete(item) -> to extension
 optimize CrudState
+больше всех сообщений
