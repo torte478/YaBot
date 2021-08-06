@@ -1,6 +1,5 @@
 ﻿namespace YaBot.App.Core.State
 {
-    using System;
     using System.Linq;
     using System.Text;
     using Database;
@@ -12,24 +11,18 @@
         
         private readonly Keys keys;
         private readonly ICrudl<int, Place> places;
-        private readonly Func<IWords, IOutput> toOutput;
-        private readonly Func<string, IOutput> toStringOutput;
-        private readonly Func<Place, IOutput> toImageOutput;
-        
+        private readonly IOutputFactory<string, IWords, Place> outputs;
+
         private State state;
         
         public PlaceCrudlState(
             Keys keys, 
             ICrudl<int, Place> places, 
-            Func<IWords, IOutput> toOutput, 
-            Func<string, IOutput> toStringOutput, 
-            Func<Place, IOutput> toImageOutput)
+            IOutputFactory<string, IWords, Place> outputs)
         {
             this.keys = keys;
             this.places = places;
-            this.toOutput = toOutput;
-            this.toStringOutput = toStringOutput;
-            this.toImageOutput = toImageOutput;
+            this.outputs = outputs;
 
             state = State.Start;
         }
@@ -54,7 +47,7 @@
                 State.Create => RunCreate(input),
                 State.Read => RunRead(input),
                 State.Delete => RunDelete(input),
-                _ => (keys.Error.ToError("Неизвестное состояние")._(toStringOutput), null)
+                _ => (keys.Error.ToError("Неизвестное состояние")._(outputs.Create), null)
             };
         }
 
@@ -66,7 +59,7 @@
                 State.Read => StartOperation(keys.Read, State.Read),
                 State.Delete => StartOperation(keys.Delete, State.Delete),
                 State.List => RunList(),
-                _ => (keys.Error.ToError("Не удалось выйти из начального состояния")._(toStringOutput), null) 
+                _ => (keys.Error.ToError("Не удалось выйти из начального состояния")._(outputs.Create), null) 
             };
         }
 
@@ -74,13 +67,13 @@
         {
             var (index, error) = TryParseIndex(input.Text);
             if (index == Undefined)
-                return (keys.Error.ToError(error)._(toStringOutput), this);
+                return (keys.Error.ToError(error)._(outputs.Create), this);
 
             var place = places.Enumerate().ToList()[index];
             places.Delete(place.Id);
 
             Reset();
-            return (keys.Delete.Success._(toOutput), null);
+            return (keys.Delete.Success._(outputs.Create), null);
         }
 
         private (int, string) TryParseIndex(string text)
@@ -104,18 +97,19 @@
         {
             var (index, error) = TryParseIndex(input.Text);
             if (index == Undefined)
-                return (keys.Error.ToError(error)._(toStringOutput), this);
+                return (keys.Error.ToError(error)._(outputs.Create), this);
 
             var place = places.Enumerate().ToList()[index];
 
             Reset();
 
-            return (toImageOutput(place), null);
+            return (outputs.Create(place), null);
         }
 
         private (IOutput, IState) RunCreate(IInput input)
         {
-            // TODO : null validators
+            if (input.Text._(string.IsNullOrEmpty))
+                return (keys.Error.ToError("Нужно ввести название")._(outputs.Create), this);
 
             input
                 ._(GetPlace)
@@ -123,13 +117,13 @@
 
             Reset();
 
-            return (keys.Create.Success._(toOutput), null); // (_, TODO)       
+            return (keys.Create.Success._(outputs.Create), null);       
         }
 
         private (IOutput, IState) StartOperation(StateKeys key, State next)
         {
             state = next;
-            return (key.Start._(toOutput), this);
+            return (key.Start._(outputs.Create), this);
         }
 
         private (IOutput, IState) RunList()
@@ -143,11 +137,9 @@
                     new StringBuilder().AppendLine(keys.List.Success.ToRandom()),
                     (acc, x) => acc.AppendLine(x))
                 .ToString()
-                ._(toStringOutput);
+                ._(outputs.Create);
             
-            // TODO : pagination
-
-            return (list, null); // TODO : null
+            return (list, null);
         }
 
         private static Place GetPlace(IInput input)

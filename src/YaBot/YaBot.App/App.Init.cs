@@ -42,6 +42,7 @@
             var places = new Crudl<Place>(context, _ => _.Places);
 
             var error = config["Error"];
+            var outputs = new OutputFactory();
             
             var startState = new StartState(
                 config["Names"],
@@ -76,24 +77,21 @@
                             Error = error
                         },
                         places,
-                        //TODO : to factory
-                        Output.Create,
-                        Output.Create,
-                        Output.Create
-                        ),
+                        outputs
+                    ),
                     new GetRandomPlaceState(
                         config["GetRandomPlace"],
                         places.Enumerate,
-                        Output.Create)
+                        outputs.Create)
                 }
                 .ToImmutableArray(),
-                Output.Create);
+                outputs.Create);
 
             States CreateStates() => new States(
                 startState, 
                 config["Reset"],
                 config["Auf"],
-                Output.Create,
+                outputs.Create,
                 Log);
 
             var bot = new Bot(createReceiver: 

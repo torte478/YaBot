@@ -34,7 +34,7 @@
         {
             return context
                 ._(getEntities)
-                .FirstOrDefault(_ => _.Id == key); // TODO : to First()
+                .FirstOrDefault(_ => _.Id == key);
         }
 
         public bool Update(T value)

@@ -53,7 +53,7 @@
 
         private static GetRandomPlaceState Create(Func<IEnumerable<Place>> getPlaces)
         {
-            return new(null, getPlaces, Output.Create);
+            return new(null, getPlaces, new OutputFactory().Create);
         }
     }
 }

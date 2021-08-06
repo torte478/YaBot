@@ -18,16 +18,17 @@
             var stoppers = A.Fake<IWords>();
             var changeState = A.Fake<IInput>();
             var reset = A.Fake<IInput>();
+            var outputs = new OutputFactory();
 
             A.CallTo(() => stoppers.Match(reset.Text)).Returns(true);
-            A.CallTo(() => start.Process(A<IInput>._)).Returns(("start"._(Output.Create), next));
-            A.CallTo(() => next.Process(A<IInput>._)).Returns(("next"._(Output.Create), next));
+            A.CallTo(() => start.Process(A<IInput>._)).Returns(("start"._(outputs.Create), next));
+            A.CallTo(() => next.Process(A<IInput>._)).Returns(("next"._(outputs.Create), next));
 
             var states = new States(
                 start, 
                 stoppers, 
                 A.Fake<IWords>(),
-                Output.Create,
+                outputs.Create,
                 _ => { });
 
             states.Process(changeState);

@@ -17,7 +17,7 @@ errors log
 regex
 виртуальная клавиатура
 DI
-убрать все Null
+убрать все Null (?, ??, FirstOrDefault)
 заменить ИД: int -> long
 Параметры в БД
 Бэкапы БД
@@ -29,4 +29,5 @@ strings to resources
 экстренное выключение
 crud.delete(item) -> to extension
 optimize CrudState
-больше всех сообщений
+message conunter
+all strings to resources

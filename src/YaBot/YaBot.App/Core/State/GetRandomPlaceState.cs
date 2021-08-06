@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Database;
     using Extensions;
 
@@ -49,19 +50,15 @@
         {
             Reset();
             
-            // TODO : write better algorithm
-            
-            var input = getPlaces() 
-                ._(_ => new LinkedList<Place>(_));
+            places.AddRange(getPlaces());
 
-            while (input.Count > 0)
+            for (var i = places.Count - 1; i > 0; --i)
             {
-                var current = input.First;
-                for (var i = random.Next(input.Count); i > 0; --i)
-                    current = current.Next;
+                var j = random.Next(i + 1);
                 
-                places.Add(current.Value);
-                input.Remove(current);
+                var temp = places[j];
+                places[j] = places[i];
+                places[i] = temp;
             }
         }
     }

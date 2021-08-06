@@ -33,10 +33,8 @@
                     }
                 },
                 places,
-                Output.Create,
-                Output.Create,
-                Output.Create
-                );
+                new OutputFactory()
+            );
 
             var count = state.Process(A.Fake<IInput>())
                 .Item1
@@ -69,10 +67,8 @@
                     }
                 },
                 places,
-                Output.Create,
-                Output.Create,
-                Output.Create
-                );
+                new OutputFactory()
+            );
 
             state.Process(A.Fake<IInput>());
             var actual = state
