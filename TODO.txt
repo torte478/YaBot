@@ -1,3 +1,5 @@
+input to lowercase
+
 immutable states
 Ауф
 Вопрос - сущ
@@ -29,3 +31,4 @@ optimize CrudState
 message conunter
 all strings to resources
 list pagination
+pgAdmin to production
