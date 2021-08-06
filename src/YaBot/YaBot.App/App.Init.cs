@@ -17,6 +17,8 @@
 
     internal partial class App
     {
+        private const string Version = "1.0.0";
+        
         private const string ConfigPath = "config.json";
         private const string CredentialsPath = "credentials.json";
 
@@ -78,11 +80,18 @@
                         },
                         places,
                         outputs
-                    ),
+                        ),
                     new GetRandomPlaceState(
                         config["GetRandomPlace"],
                         places.Enumerate,
-                        outputs.Create)
+                        outputs.Create
+                        ),
+                    new StatusState(
+                        Version,
+                        config["Status_Keys"],
+                        config["Status_Success"],
+                        outputs.Create
+                        )
                 }
                 .ToImmutableArray(),
                 outputs.Create);

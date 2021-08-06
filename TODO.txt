@@ -1,7 +1,7 @@
-TODO's
-immutable states
-добавить команду статус и версию
+починить баг с выводом картинок
+подправить получение места
 
+immutable states
 Ауф
 Вопрос - сущ
 Вопрос - кто
@@ -31,3 +31,4 @@ crud.delete(item) -> to extension
 optimize CrudState
 message conunter
 all strings to resources
+list pagination
