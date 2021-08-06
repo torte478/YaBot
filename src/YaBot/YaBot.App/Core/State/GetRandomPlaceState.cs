@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using Database;
     using Extensions;
     using Outputs;
@@ -12,17 +11,23 @@
         private readonly Random random = new();
         
         private readonly IWords keys;
+        private readonly IWords next;
         private readonly Func<IEnumerable<Place>> getPlaces;
-        private readonly Func<Place, IOutput> toOutput;
+        private readonly IOutputFactory<Place> outputs;
 
         private readonly List<Place> places = new();
-        private int index = 0;
+        private int index;
 
-        public GetRandomPlaceState(IWords keys, Func<IEnumerable<Place>> getPlaces, Func<Place, IOutput> toOutput)
+        public GetRandomPlaceState(
+            IWords keys, 
+            IWords next, 
+            Func<IEnumerable<Place>> getPlaces, 
+            IOutputFactory<Place> outputs)
         {
             this.keys = keys;
+            this.next = next;
             this.getPlaces = getPlaces;
-            this.toOutput = toOutput;
+            this.outputs = outputs;
         }
 
         public bool IsInput(IInput input)
@@ -32,12 +37,17 @@
 
         public (IOutput, IState) Process(IInput input)
         {
+            var process = input.Text
+                ._(_ => keys.Match(_) || next.Match(_));
+            if (!process)
+                return (outputs.ToEmpty(), this);
+            
             if (index >= places.Count)
                 ReloadPlaces();
 
             var place = places[index++];
 
-            return (place._(toOutput), this);
+            return (place._(outputs.Create), this);
         }
 
         public IState Reset()

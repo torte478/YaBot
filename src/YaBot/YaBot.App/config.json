@@ -61,11 +61,17 @@
   "PlaceCrudlState_Delete_Success": [
     "Место удалено. Внимание, индексы мест могли сместиться"
   ],
-  "GetRandomPlace": [
+  "GetRandomPlace_Keys": [
     "куда",
     "пойти",
     "стартуем",
     "getrandom"
+  ],
+  "GetRandomPlace_Next": [
+    "еще",
+    "ещё",
+    "дальше",
+    "next"
   ],
   "Status_Keys": [
     "статус",

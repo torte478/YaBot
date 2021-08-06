@@ -5,8 +5,13 @@
     using Core.Outputs;
     using Extensions;
 
-    public sealed class OutputFactory : IOutputFactory<string, IWords, Place>
+    public sealed class OutputFactory : IOutputFactory<string, IWords, Place>, IOutputFactory<Place>
     {
+        public IOutput ToEmpty()
+        {
+            return new Output();
+        }
+
         public IOutput Create(string input)
         {
             return new Output

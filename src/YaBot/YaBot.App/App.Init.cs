@@ -82,9 +82,10 @@
                         outputs
                         ),
                     new GetRandomPlaceState(
-                        config["GetRandomPlace"],
+                        config["GetRandomPlace_Keys"],
+                        config["GetRandomPlace_Next"],
                         places.Enumerate,
-                        outputs.Create
+                        outputs
                         ),
                     new StatusState(
                         Version,

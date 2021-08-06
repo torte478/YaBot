@@ -2,6 +2,7 @@
 {
     public interface IOutputFactory<in T>
     {
+        IOutput ToEmpty();
         IOutput Create(T input);
     }
 
