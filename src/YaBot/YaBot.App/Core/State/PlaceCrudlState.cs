@@ -16,6 +16,8 @@
 
         private State state;
         
+        public string Name => "PlaceCrudl";
+        
         public PlaceCrudlState(
             Keys keys, 
             ICrudl<int, Place> places, 

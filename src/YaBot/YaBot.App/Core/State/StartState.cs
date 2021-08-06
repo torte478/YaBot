@@ -21,6 +21,8 @@
             this.toOutput = toOutput;
         }
 
+        public string Name => "Start";
+
         public bool IsInput(IInput input)
         {
             return true;

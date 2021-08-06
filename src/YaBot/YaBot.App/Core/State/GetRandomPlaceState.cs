@@ -17,6 +17,8 @@
 
         private readonly List<Place> places = new();
         private int index;
+        
+        public string Name => "GetRandomPlace";
 
         public GetRandomPlaceState(
             IWords keys, 

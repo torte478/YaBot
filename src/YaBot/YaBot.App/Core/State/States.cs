@@ -1,6 +1,7 @@
 ﻿namespace YaBot.App.Core.State
 {
     using System;
+    using System.Runtime.CompilerServices;
     using System.Text;
     using Extensions;
     using Outputs;
@@ -16,6 +17,16 @@
         private readonly Action<string> log;
 
         private IState current;
+        private IState Current
+        {
+            get => current;
+            set
+            {
+                if (current != value)
+                    log($"{current.Name} => {value.Name}");
+                current = value;
+            }
+        }
 
         public States(
             string version,
@@ -42,22 +53,19 @@
             if (status.Match(input.Text))
                 return GetStatus()._(outputs.Create);
             
-            var reset = current != start && stoppers.Match(input.Text); 
+            var reset = Current != start && stoppers.Match(input.Text); 
             if (reset)
             {
-                current.Reset();
-                current = start;
+                Current.Reset();
+                Current = start;
                 return auf._(outputs.Create);
             }
             
-            var (answer, next) =  current.Process(input);
+            var (answer, next) =  Current.Process(input);
 
             next ??= start;
             
-            if (current != next)
-                log($"{current} => {next}");
-            
-            current = next;
+            Current = next;
             
             return answer;
         }
@@ -68,7 +76,7 @@
                 .Append("Version: ")
                 .AppendLine(version)
                 .Append("State: ")
-                .AppendLine(current.ToString())
+                .AppendLine(Current.ToString())
                 .ToString();
         }
     }
