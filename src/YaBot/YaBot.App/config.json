@@ -1,0 +1,82 @@
+{
+  "Names": [
+    "ярык",
+    "бот",
+    "dbg",
+    "ya_rik_bot",
+    "ya_rik_debug_bot"
+  ],
+  "Ping": [
+    "Звали меня?",
+    "Че надо?",
+    "?",
+    "Опять работа?"
+  ],
+  "Auf": [
+    "Ауф!"
+  ],
+  "Reset": [
+    "достаточно",
+    "reset",
+    "хватит"
+  ],
+  "Error": [
+    "Ошибка!",
+    "Я сломался!",
+    "Неееееееееет!",
+    "Беда..."
+  ],
+  "PlaceCrudlState_Create_Keys": [
+    "create",
+    "добавь"
+  ],
+  "PlaceCrudlState_Create_Start": [
+    "Введите название места. Будет здорово, если вы прикрепите его фотографию"
+  ],
+  "PlaceCrudlState_Create_Success": [
+    "Новое место успешно добавлено"
+  ],
+  "PlaceCrudlState_List_Keys": [
+    "list",
+    "список"
+  ],
+  "PlaceCrudlState_List_Success": [
+    "Список мест:"
+  ],
+  "PlaceCrudlState_Read_Keys": [
+    "get",
+    "покажи"
+  ],
+  "PlaceCrudlState_Read_Start": [
+    "Введите номер места"
+  ],
+  "PlaceCrudlState_Delete_Keys": [
+    "delete",
+    "удали",
+    "удоли"
+  ],
+  "PlaceCrudlState_Delete_Start": [
+    "Введите номер места"
+  ],
+  "PlaceCrudlState_Delete_Success": [
+    "Место удалено. Внимание, индексы мест могли сместиться"
+  ],
+  "GetRandomPlace_Keys": [
+    "куда",
+    "пойти",
+    "стартуем",
+    "getrandom"
+  ],
+  "GetRandomPlace_Next": [
+    "еще",
+    "ещё",
+    "дальше",
+    "next"
+  ],
+  "Status": [
+    "статус",
+    "доклад",
+    "нормалды",
+    "status"
+  ]
+}

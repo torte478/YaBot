@@ -1,0 +1,31 @@
+immutable states
+Ауф
+Вопрос - сущ
+Вопрос - кто
+Вопрос - или
+Редактирование ключевых слов
+Счетчик детей
+П*****в
+Развертывание
+Миграции
+Uptime
+errors log
+теги
+regex
+виртуальная клавиатура
+DI
+убрать все Null (?, ??, FirstOrDefault)
+заменить ИД: int -> long
+Параметры в БД
+Бэкапы БД
+message.ToString()
+offline debug
+keywods duplicate validation
+fix public-internal
+strings to resources
+экстренное выключение
+crud.delete(item) -> to extension
+optimize CrudState
+message conunter
+all strings to resources
+list pagination
