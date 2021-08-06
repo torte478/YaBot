@@ -169,7 +169,15 @@
 
             return State.Unknown;
         }
-        
+
+        public override string ToString()
+        {
+            return new StringBuilder()
+                .AppendLine(base.ToString())
+                .AppendLine(state.ToString())
+                .ToString();
+        }
+
         private enum State
         {
             Unknown,

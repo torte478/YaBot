@@ -86,22 +86,18 @@
                         config["GetRandomPlace_Next"],
                         places.Enumerate,
                         outputs
-                        ),
-                    new StatusState(
-                        Version,
-                        config["Status_Keys"],
-                        config["Status_Success"],
-                        outputs.Create
                         )
                 }
                 .ToImmutableArray(),
                 outputs.Create);
 
             States CreateStates() => new States(
+                Version,
                 startState, 
                 config["Reset"],
                 config["Auf"],
-                outputs.Create,
+                config["Status"],
+                outputs,
                 Log);
 
             var bot = new Bot(createReceiver: 

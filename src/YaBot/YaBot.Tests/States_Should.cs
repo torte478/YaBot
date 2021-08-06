@@ -25,10 +25,12 @@
             A.CallTo(() => next.Process(A<IInput>._)).Returns(("next"._(outputs.Create), next));
 
             var states = new States(
+                string.Empty,
                 start, 
                 stoppers, 
                 A.Fake<IWords>(),
-                outputs.Create,
+                A.Fake<IWords>(),
+                outputs,
                 _ => { });
 
             states.Process(changeState);
