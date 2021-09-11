@@ -3,6 +3,7 @@ namespace YaBot.PriorityApp
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
     using YaBot.Core;
     using YaBot.Core.Extensions;
     using YaBot.Core.IO;
@@ -89,7 +90,27 @@ namespace YaBot.PriorityApp
             if (result.added)
             {
                 node = Undefined;
-                return GetStatus();
+                
+                var items = current
+                    .ToPriorityList()
+                    .ToArray();
+
+                if (items.Length == 0) return "{}";
+
+                var sb = new StringBuilder();
+                var limit = items.Length > 20;
+                if (limit)
+                    sb.AppendLine($"20 of {items.Length}");
+                
+                sb = items
+                    .Take(20)
+                    .Select(_ => $"{_.id}: {_.text}")
+                    .Aggregate(sb, (acc, x) => acc.AppendLine(x));
+
+                if (limit)
+                    sb.Append("...");
+
+                return sb.ToString();
             }
             else
             {
@@ -158,7 +179,7 @@ namespace YaBot.PriorityApp
                 return current
                     .ToPriorityList()
                     .Select(_ => $"{_.id}: {_.text}")
-                    ._(ConcatToString);    
+                    ._(ConcatToString);
             }
         }
 

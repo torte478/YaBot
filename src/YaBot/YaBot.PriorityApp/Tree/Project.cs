@@ -88,15 +88,25 @@
             });
         }
 
-        private void UpdateStored(Dictionary<int, int> items)
+        private void UpdateStored(Dictionary<int, int> update)
         {
-            foreach (var (id, value) in items)
+            var projectId = storage
+                .Enumerate()
+                .First(_ => _.Id == update.Keys.First())
+                .Project;
+            
+            var entities = storage
+                .Enumerate()
+                .Where(_ => _.Project == projectId)
+                .ToArray();
+            
+            foreach (var entity in entities)
             {
-                storage.Update(new Objective
-                {
-                    Id = id,
-                    Value = value
-                });
+                entity.Value = update.ContainsKey(entity.Id)
+                    ? update[entity.Id]
+                    : int.MaxValue;
+                
+                storage.Update(entity);
             }
         }
     }
