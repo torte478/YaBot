@@ -1,23 +1,25 @@
-﻿namespace YaBot.App.Core.Database
+﻿namespace YaBot.Core
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Extensions;
     using Microsoft.EntityFrameworkCore;
+    using YaBot.Core.Extensions;
 
-    internal sealed class Crudl<T> : ICrudl<int, T> where T : class, IHasId<int>
+    public sealed class Crudl<TContext, TEntity> : ICrudl<int, TEntity>
+        where TContext : DbContext
+        where TEntity : class, IHasId<int>
     {
-        private readonly Context context;
-        private readonly Func<Context, DbSet<T>> getEntities;
+        private readonly TContext context;
+        private readonly Func<TContext, DbSet<TEntity>> getEntities;
 
-        public Crudl(Context context, Func<Context, DbSet<T>> getEntities)
+        public Crudl(TContext context, Func<TContext, DbSet<TEntity>> getEntities)
         {
             this.context = context;
             this.getEntities = getEntities;
         }
 
-        public int Create(T value)
+        public int Create(TEntity value)
         {
             var key = context
                 ._(getEntities)
@@ -30,14 +32,14 @@
             return key;
         }
 
-        public T Read(int key)
+        public TEntity Read(int key)
         {
             return context
                 ._(getEntities)
                 .FirstOrDefault(_ => _.Id == key);
         }
 
-        public bool Update(T value)
+        public bool Update(TEntity value)
         {
             using var transaction = context.Database.BeginTransaction();
 
@@ -65,7 +67,7 @@
             return item != null;
         }
 
-        public IEnumerable<T> Enumerate()
+        public IEnumerable<TEntity> Enumerate()
         {
             return context._(getEntities);
         }

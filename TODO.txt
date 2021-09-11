@@ -1,4 +1,5 @@
 input to lowercase
+раБОТает
 
 immutable states
 Ауф
@@ -13,7 +14,7 @@ immutable states
 Uptime
 errors log
 теги
-regex
+regex 
 виртуальная клавиатура
 DI
 убрать все Null (?, ??, FirstOrDefault)
@@ -26,9 +27,21 @@ keywods duplicate validation
 fix public-internal
 strings to resources
 экстренное выключение
+выключение/включение
 crud.delete(item) -> to extension
 optimize CrudState
-message conunter
+message counter
 all strings to resources
 list pagination
 pgAdmin to production
+listen only caller
+"Короче, давай чтоб при фразе «шевелись плотва» он автоматом кидал рандомное место)"
+extremal disable
+шарм
+"Надо подумать" перед долгими запросами
+silince breaker
+мат-фильтр
+мат-фильтр + message counter
+ignore commands from forwarded messages and replyes
+immutable states
+Рифмоплет

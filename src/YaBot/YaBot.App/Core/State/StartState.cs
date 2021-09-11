@@ -5,6 +5,8 @@
     using System.Linq;
     using Extensions;
     using Outputs;
+    using YaBot.Core;
+    using YaBot.Core.Extensions;
 
     internal sealed class StartState : IState
     {

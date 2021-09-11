@@ -10,6 +10,8 @@
     using App.TelegramApi;
     using FakeItEasy;
     using NUnit.Framework;
+    using YaBot.Core;
+    using YaBot.Core.Extensions;
 
     [TestFixture]
     internal sealed class GetRandomPlaceState_Should

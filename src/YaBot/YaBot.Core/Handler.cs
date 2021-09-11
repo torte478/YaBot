@@ -1,17 +1,15 @@
-﻿namespace YaBot.App.TelegramApi
+﻿namespace YaBot.Core
 {
     using System;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-    using Core;
-    using Core.Outputs;
-    using Extensions;
     using Telegram.Bot;
     using Telegram.Bot.Extensions.Polling;
     using Telegram.Bot.Types;
     using Telegram.Bot.Types.Enums;
     using Telegram.Bot.Types.InputFiles;
+    using YaBot.Core.Extensions;
 
     public sealed class Handler : IUpdateHandler
     {

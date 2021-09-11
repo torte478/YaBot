@@ -1,12 +1,11 @@
-﻿namespace YaBot.App
+﻿namespace YaBot.PriorityApp
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Core.Database;
-    using Extensions;
     using Telegram.Bot;
     using YaBot.Core.Extensions;
+    using YaBot.PriorityApp.Database;
 
     internal sealed partial class App : IDisposable
     {

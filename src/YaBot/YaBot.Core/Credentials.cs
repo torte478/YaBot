@@ -1,6 +1,6 @@
-﻿namespace YaBot.App.Configs
+﻿namespace YaBot.Core
 {
-    internal sealed class Credentials
+    public sealed class Credentials
     {
         public string Database { get; set; }
         

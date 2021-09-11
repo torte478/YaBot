@@ -1,4 +1,4 @@
-﻿namespace YaBot.App.Core.Outputs
+﻿namespace YaBot.Core
 {
     public interface IOutput
     {

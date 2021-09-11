@@ -5,14 +5,14 @@
     using System.Collections.Immutable;
     using System.Linq;
     using System.Threading;
-    using Configs;
     using Core;
     using Core.Database;
     using Core.State;
-    using Extensions;
     using Newtonsoft.Json;
     using Telegram.Bot;
     using TelegramApi;
+    using YaBot.Core;
+    using YaBot.Core.Extensions;
     using File = System.IO.File;
 
     internal partial class App
@@ -41,7 +41,7 @@
             
             var context = new Context(credentials.Database);
             
-            var places = new Crudl<Place>(context, _ => _.Places);
+            var places = new Crudl<Context, Place>(context, _ => _.Places);
 
             var error = config["Error"];
             var outputs = new OutputFactory();

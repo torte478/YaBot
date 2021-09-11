@@ -1,15 +1,14 @@
-﻿namespace YaBot.App.TelegramApi
+﻿namespace YaBot.Core
 {
     using System;
     using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Core;
     using Telegram.Bot;
     using Telegram.Bot.Types;
 
-    internal sealed class Input : IInput
+    public sealed class Input : IInput
     {
         public DateTime Date { get; private init; }
         public long Chat { get; private init;}

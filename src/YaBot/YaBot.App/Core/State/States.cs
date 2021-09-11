@@ -5,6 +5,8 @@
     using System.Text;
     using Extensions;
     using Outputs;
+    using YaBot.Core;
+    using YaBot.Core.Extensions;
 
     public sealed class States
     {

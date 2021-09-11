@@ -11,6 +11,7 @@
     using Microsoft.EntityFrameworkCore.Diagnostics;
     using NUnit.Framework;
     using Telegram.Bot.Types;
+    using YaBot.Core;
 
     [TestFixture]
     internal sealed class PlaceCrudlState_Should

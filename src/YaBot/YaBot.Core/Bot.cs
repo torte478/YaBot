@@ -1,8 +1,7 @@
-﻿namespace YaBot.App.Core
+﻿namespace YaBot.Core
 {
     using System;
     using System.Collections.Generic;
-    using Outputs;
 
     public sealed class Bot
     {

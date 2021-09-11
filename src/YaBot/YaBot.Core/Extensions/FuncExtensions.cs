@@ -1,4 +1,4 @@
-﻿namespace YaBot.App.Extensions
+﻿namespace YaBot.Core.Extensions
 {
     using System;
 

@@ -4,6 +4,7 @@
     using Core.Database;
     using Core.Outputs;
     using Extensions;
+    using YaBot.Core;
 
     public sealed class OutputFactory : IOutputFactory<string, IWords, Place>, IOutputFactory<Place>
     {

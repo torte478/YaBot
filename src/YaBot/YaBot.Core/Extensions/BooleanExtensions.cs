@@ -1,6 +1,6 @@
-﻿namespace YaBot.App.Extensions
+﻿namespace YaBot.Core.Extensions
 {
-    internal static class BooleanExtensions
+    public static class BooleanExtensions
     {
         public static bool Not(this bool x)
         {

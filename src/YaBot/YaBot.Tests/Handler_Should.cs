@@ -9,6 +9,7 @@
     using FakeItEasy;
     using NUnit.Framework;
     using Telegram.Bot.Types;
+    using YaBot.Core;
 
     [TestFixture]
     internal sealed class Handler_Should

@@ -4,6 +4,7 @@
     using App.Core;
     using App.Extensions;
     using NUnit.Framework;
+    using YaBot.Core.Extensions;
 
     [TestFixture]
     internal sealed class WordsExtensions_Should
