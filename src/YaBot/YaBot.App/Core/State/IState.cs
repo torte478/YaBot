@@ -2,6 +2,7 @@
 {
     using Outputs;
     using YaBot.Core;
+    using YaBot.Core.IO;
 
     public interface IState
     {

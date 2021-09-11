@@ -1,4 +1,4 @@
-﻿namespace YaBot.Core
+﻿namespace YaBot.Core.IO
 {
     using System;
     using System.IO;

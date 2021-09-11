@@ -5,6 +5,7 @@
     using Core.Outputs;
     using Extensions;
     using YaBot.Core;
+    using YaBot.Core.IO;
 
     public sealed class OutputFactory : IOutputFactory<string, IWords, Place>, IOutputFactory<Place>
     {

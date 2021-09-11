@@ -1,6 +1,7 @@
 ﻿namespace YaBot.App.Core.Outputs
 {
     using YaBot.Core;
+    using YaBot.Core.IO;
 
     public interface IOutputFactory<in T>
     {

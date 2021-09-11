@@ -12,7 +12,9 @@
     using Telegram.Bot;
     using TelegramApi;
     using YaBot.Core;
+    using YaBot.Core.Database;
     using YaBot.Core.Extensions;
+    using YaBot.Core.IO;
     using File = System.IO.File;
 
     internal partial class App

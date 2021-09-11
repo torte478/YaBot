@@ -10,6 +10,7 @@
     using Telegram.Bot.Types.Enums;
     using Telegram.Bot.Types.InputFiles;
     using YaBot.Core.Extensions;
+    using YaBot.Core.IO;
 
     public sealed class Handler : IUpdateHandler
     {

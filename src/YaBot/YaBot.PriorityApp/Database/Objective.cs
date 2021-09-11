@@ -2,7 +2,9 @@
 
 namespace YaBot.PriorityApp.Database
 {
-    public partial class Objective
+    using YaBot.Core.Database;
+
+    public partial class Objective : IHasId<int>
     {
         public int Id { get; set; }
         public int Value { get; set; }

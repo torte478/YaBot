@@ -3,6 +3,7 @@
     using System;
     using App.Core.Outputs;
     using NUnit.Framework;
+    using YaBot.Core.IO;
 
     [TestFixture]
     internal sealed class Output_Should

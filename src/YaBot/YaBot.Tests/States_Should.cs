@@ -8,6 +8,7 @@
     using NUnit.Framework;
     using YaBot.Core;
     using YaBot.Core.Extensions;
+    using YaBot.Core.IO;
 
     [TestFixture]
     internal sealed class States_Should

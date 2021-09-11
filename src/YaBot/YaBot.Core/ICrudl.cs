@@ -1,6 +1,7 @@
 ﻿namespace YaBot.Core
 {
     using System.Collections.Generic;
+    using YaBot.Core.Database;
 
     public interface ICrudl<TKey, TValue> where TValue : IHasId<TKey>
     {

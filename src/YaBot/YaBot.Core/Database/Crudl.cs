@@ -1,4 +1,4 @@
-﻿namespace YaBot.Core
+﻿namespace YaBot.Core.Database
 {
     using System;
     using System.Collections.Generic;
@@ -21,15 +21,11 @@
 
         public int Create(TEntity value)
         {
-            var key = context
-                ._(getEntities)
-                .Add(value)
-                .Entity
-                .Id;
+            context._(getEntities).Add(value);
 
             context.SaveChanges();
             
-            return key;
+            return value.Id;
         }
 
         public TEntity Read(int key)

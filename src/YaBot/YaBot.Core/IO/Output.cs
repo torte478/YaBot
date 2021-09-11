@@ -1,7 +1,5 @@
-﻿namespace YaBot.App.Core.Outputs
+﻿namespace YaBot.Core.IO
 {
-    using Extensions;
-    using YaBot.Core;
     using YaBot.Core.Extensions;
 
     public sealed class Output : IOutput

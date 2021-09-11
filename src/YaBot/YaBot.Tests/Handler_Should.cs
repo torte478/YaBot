@@ -10,6 +10,7 @@
     using NUnit.Framework;
     using Telegram.Bot.Types;
     using YaBot.Core;
+    using YaBot.Core.IO;
 
     [TestFixture]
     internal sealed class Handler_Should

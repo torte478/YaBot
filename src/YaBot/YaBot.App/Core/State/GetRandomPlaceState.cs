@@ -7,6 +7,7 @@
     using Outputs;
     using YaBot.Core;
     using YaBot.Core.Extensions;
+    using YaBot.Core.IO;
 
     public sealed class GetRandomPlaceState : IState
     {

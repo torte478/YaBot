@@ -5,9 +5,13 @@
     using Newtonsoft.Json;
     using Telegram.Bot;
     using YaBot.Core;
+    using YaBot.Core.Database;
     using YaBot.Core.Extensions;
+    using YaBot.Core.IO;
     using YaBot.PriorityApp.Database;
+    using YaBot.PriorityApp.Tree;
     using File = System.IO.File;
+    using Project = YaBot.PriorityApp.Database.Project;
 
     internal partial class App
     {
@@ -22,11 +26,19 @@
                 throw new Exception("Credentials is null");
 
             var context = new Context(credentials.Database);
-            
-            var places = new Crudl<Context, Project>(context, _ => _.Projects);
 
-            var bot = new Bot(createReceiver: 
-                () => _ => null, // TODO
+            var objectives = new Crudl<Context,Objective>(context, _ => _.Objectives);
+            var service = new Service(
+                new Crudl<Context, Project>(context, _ => _.Projects),
+                objectives,
+                projectId => Tree.Project.Create(
+                    projectId, 
+                    objectives,
+                    () => new BalancedTree<int>(
+                        new Measure(1024))));
+            
+            var bot = new Bot(
+                createReceiver: () => service.Process,
                 begin: DateTime.UtcNow); 
 
             var handler = new Handler(Input.CreateAsync, bot.Receive, Log);
@@ -34,7 +46,10 @@
             return new App(
                 new TelegramBotClient(credentials.Telegram),
                 new CancellationTokenSource(),
-                (client, cancellation) => TelegramBotClientPollingExtensions.ReceiveAsync(client, handler, cancellationToken: cancellation),
+                (client, cancellation) => TelegramBotClientPollingExtensions.ReceiveAsync(
+                    client, 
+                    handler, 
+                    cancellationToken: cancellation),
                 context,
                 Log);
         }
