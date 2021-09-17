@@ -24,8 +24,4 @@
       <ProjectReference Include="..\YaBot.Core\YaBot.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Configs" />
-    </ItemGroup>
-
 </Project>
