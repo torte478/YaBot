@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
+    using System.Text;
     using YaBot.Core.Extensions;
 
     public sealed class Words : IWords
@@ -36,17 +37,23 @@
             return GetEnumerator();
         }
 
-        private IEnumerable<string> Parse(string text)
+        private static IEnumerable<string> Parse(string text)
         {
-            var punctuation = text
-                .Where(char.IsPunctuation)
-                .Distinct()
-                .ToArray();
+            var result = new StringBuilder();
+            foreach (var symbol in text.ToLower().Concat(new[] { '.' }))
+            {
+                if (char.IsLetterOrDigit(symbol))
+                {
+                    result.Append(symbol);
+                }
+                else
+                {
+                    if (result.Length > 0)
+                        yield return result.ToString();
 
-            return text
-                .ToLower()
-                .Split()
-                .Select(_ => _.Trim(punctuation));
+                    result.Clear();
+                }
+            }
         }
     }
 }

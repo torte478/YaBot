@@ -13,5 +13,21 @@
 
             Assert.That(words.Match("TEST"), Is.True);
         }
+
+        [Test]
+        [TestCase('-')]
+        [TestCase('^')]
+        [TestCase('?')]
+        [TestCase(';')]
+        [TestCase('.')]
+        [TestCase(',')]
+        [TestCase('!')]
+        public void IgnorePunctuation_WhenParse(char symbol)
+        {
+            var words = Words.Create(new[] { "first", "second" });
+            var input = $"first{symbol}second";
+
+            Assert.That(words.Match(input), Is.True);
+        }
     }
 }
