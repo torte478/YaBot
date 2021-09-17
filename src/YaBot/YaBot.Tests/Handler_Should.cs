@@ -1,11 +1,7 @@
 ﻿namespace YaBot.Tests
 {
-    using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using App.Core;
-    using App.Core.Outputs;
-    using App.TelegramApi;
     using FakeItEasy;
     using NUnit.Framework;
     using Telegram.Bot.Types;
@@ -15,45 +11,65 @@
     [TestFixture]
     internal sealed class Handler_Should
     {
+        private Handler handler;
+        private FakeReceiver receiver;
+
+        [SetUp]
+        public void SetUp()
+        {
+            receiver = new FakeReceiver();
+
+            handler = new Handler(
+                (_, _, _) => Task.Run(A.Fake<IInput>),
+                receiver.Receive,
+                _ => { }
+            );
+        }
+
         [Test]
         public async Task AllowUpdate_WhenTypeIsNotText()
         {
-            var called = false;
-            var handler = Create(_ => { called = true; return null; });
             var update = new Update { Message = new Message() };
 
             await handler.HandleUpdateAsync(null, update, new CancellationToken());
 
-            Assert.That(called, Is.True);
+            Assert.That(receiver.Called, Is.True);
         }
 
         [Test]
         public void CheckThatMessageIsNotNull_WhenLog()
         {
-            var handler = Create(null);
-
-            Assert.DoesNotThrowAsync(() => 
+            Assert.DoesNotThrowAsync(() =>
                 handler.HandleUpdateAsync(null, new Update(), new CancellationToken()));
         }
 
         [Test]
         public async Task IgnoreMessage_WhenItIsNull()
         {
-            var called = false;
-            var handler = Create(_ => { called = true; return null; });
-
             await handler.HandleUpdateAsync(null, new Update(), new CancellationToken());
 
-            Assert.That(called, Is.False);
+            Assert.That(receiver.Called, Is.False);
         }
 
-        private static Handler Create(Func<IInput, IOutput> receive)
+        [Test]
+        public async Task IgnoreMessage_WhenItWasForwarded()
         {
-            return new Handler(
-                (_, _, _) => Task.Run(A.Fake<IInput>),
-                receive,
-                _ => { }
-            );
+            var update = new Update { Message = new Message { ForwardFrom = A.Fake<User>() } };
+
+            await handler.HandleUpdateAsync(null, update, new CancellationToken());
+
+            Assert.That(receiver.Called, Is.False);
+        }
+
+        private class FakeReceiver
+        {
+            public bool Called { get; private set; }
+
+            public IOutput Receive(IInput input)
+            {
+                Called = true;
+                return null;
+            }
         }
     }
 }

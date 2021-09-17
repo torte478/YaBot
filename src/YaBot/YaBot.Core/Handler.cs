@@ -34,7 +34,7 @@
 
         public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            if (update?.Message == null)
+            if (update?.Message is not {ForwardFrom: null})
                 return;
 
             log($"=> {update.Message?.Text ?? "?"}");
