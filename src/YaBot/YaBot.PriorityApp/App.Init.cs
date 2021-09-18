@@ -39,7 +39,8 @@
             
             var bot = new Bot(
                 createReceiver: () => service.Process,
-                begin: DateTime.UtcNow); 
+                begin: DateTime.UtcNow,
+                Console.WriteLine);
 
             var handler = new Handler(Input.CreateAsync, bot.Receive, Log);
 

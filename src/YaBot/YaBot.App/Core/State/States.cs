@@ -1,11 +1,8 @@
 ﻿namespace YaBot.App.Core.State
 {
     using System;
-    using System.Runtime.CompilerServices;
     using System.Text;
-    using Extensions;
     using Outputs;
-    using YaBot.Core;
     using YaBot.Core.Extensions;
     using YaBot.Core.IO;
 

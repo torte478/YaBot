@@ -24,7 +24,7 @@
         private const string ConfigPath = "config.json";
         private const string CredentialsPath = "credentials.json";
 
-        public static App Init()
+        public static App Init(Action<string> log)
         {
             var credentials = CredentialsPath
                 ._(File.ReadAllText)
@@ -100,33 +100,21 @@
                 config["Auf"],
                 config["Status"],
                 outputs,
-                Log);
+                log);
 
             var bot = new Bot(createReceiver: 
                 () => CreateStates().Process,
-                begin: DateTime.UtcNow); 
+                begin: DateTime.UtcNow,
+                log);
 
-            var handler = new Handler(Input.CreateAsync, bot.Receive, Log);
+            var handler = new Handler(Input.CreateAsync, bot.Receive, log);
 
             return new App(
                 new TelegramBotClient(credentials.Telegram),
                 new CancellationTokenSource(),
                 (client, cancellation) => client.ReceiveAsync(handler, cancellationToken: cancellation),
                 context,
-                Log);
-        }
-
-        private static void Log(string message)
-        {
-            #if DEBUG
-
-            if (string.IsNullOrEmpty(message))
-                return;
-            
-            $"{DateTime.Now.ToLongTimeString()} {message}"
-                ._(Console.WriteLine);
-            
-            #endif
+                log);
         }
     }
 }
