@@ -25,7 +25,7 @@
             if (string.IsNullOrEmpty(message))
                 return;
 
-            var formatted = $"{DateTime.Now.ToLongTimeString()} => {message}{Environment.NewLine}";
+            var formatted = $"{DateTime.Now} => {message}{Environment.NewLine}";
             Console.Write(formatted);
             File.AppendAllText("log.txt", formatted);
         }

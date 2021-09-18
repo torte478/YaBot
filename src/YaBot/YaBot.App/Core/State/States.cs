@@ -28,6 +28,9 @@
             }
         }
 
+        // TODO : wrong name
+        private DateTime StartTime { get; }
+
         public States(
             string version,
             IState start, 
@@ -46,6 +49,7 @@
             this.log = log;
 
             current = start;
+            StartTime = DateTime.Now;
         }
 
         public IOutput Process(IInput input)
@@ -73,10 +77,21 @@
         private string GetStatus()
         {
             return new StringBuilder()
-                .Append("Version: ")
-                .AppendLine(version)
-                .Append("State: ")
-                .AppendLine(Current.ToString())
+                .AppendLine($"Version: {version}")
+                .AppendLine($"Started at {StartTime}")
+                .AppendLine($"Uptime: {GetFormattedUptime()}")
+                .AppendLine($"State: {Current}")
+                .ToString();
+        }
+
+        private string GetFormattedUptime()
+        {
+            var total = DateTime.Now.Subtract(StartTime);
+
+            return new StringBuilder()
+                .Append(total.Days > 0 ? $"{total.Days} d " : string.Empty)
+                .Append(total.Hours > 0 ? $"{total.Hours} h " : string.Empty)
+                .Append($"{total.Minutes} m")
                 .ToString();
         }
     }
