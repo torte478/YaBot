@@ -1,12 +1,13 @@
 ﻿namespace YaBot.App.Core.State
 {
+    using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using Database;
     using Extensions;
     using Outputs;
     using YaBot.Core;
-    using YaBot.Core.Database;
     using YaBot.Core.Extensions;
     using YaBot.Core.IO;
 
@@ -17,19 +18,24 @@
         private readonly Keys keys;
         private readonly ICrudl<int, Place> places;
         private readonly IOutputFactory<string, IWords, Place> outputs;
+        private readonly Func<IEnumerable<Place>, int, Pagination<Place>> paginate;
 
         private State state;
+
+        private int page;
         
         public string Name => "PlaceCrudl";
         
         public PlaceCrudlState(
             Keys keys, 
             ICrudl<int, Place> places, 
-            IOutputFactory<string, IWords, Place> outputs)
+            IOutputFactory<string, IWords, Place> outputs,
+            Func<IEnumerable<Place>, int, Pagination<Place>> paginate)
         {
             this.keys = keys;
             this.places = places;
             this.outputs = outputs;
+            this.paginate = paginate;
 
             state = State.Start;
         }
@@ -54,6 +60,7 @@
                 State.Create => RunCreate(input),
                 State.Read => RunRead(input),
                 State.Delete => RunDelete(input),
+                State.List => RunList(input),
                 _ => (keys.Error.ToError("Неизвестное состояние")._(outputs.Create), null)
             };
         }
@@ -133,20 +140,51 @@
             return (key.Start._(outputs.Create), this);
         }
 
+        private (IOutput, IState) RunList(IInput input)
+        {
+            if (keys.List.Next.Match(input.Text))
+            {
+                ++page;
+                return RunList();
+            }
+
+            if (keys.List.Previous.Match(input.Text))
+            {
+                page = Math.Max(0, page - 1);
+                return RunList();
+            }
+
+            if (keys.List.Close.Match(input.Text))
+            {
+                page = 0;
+                return (null, null);
+            }
+
+            return (null, this);
+        }
+
         private (IOutput, IState) RunList()
         {
-            var list = places
-                .Enumerate()
+            var list = places.Enumerate()._(paginate, page);
+            var top = list.Paginated
+                ? $": {list.Start}..{list.Finish} из {list.Total}"
+                : string.Empty;
+
+            var result = list.Items
                 .Select(_ => _.Name)
                 .ToList()
                 .Select((x, i) => $"{i}. {x}")
                 .Aggregate(
-                    new StringBuilder().AppendLine(keys.List.Success.ToRandom()),
+                    new StringBuilder()
+                            .Append(keys.List.Success.ToRandom())
+                            .AppendLine(top)
+                            .AppendLine(),
                     (acc, x) => acc.AppendLine(x))
                 .ToString()
                 ._(outputs.Create);
-            
-            return (list, null);
+
+            state = State.List;
+            return (result, this);
         }
 
         private static Place GetPlace(IInput input)
@@ -161,6 +199,7 @@
 
         private State Match(string message)
         {
+            //TODO : shit
             if (keys.Create?.Keys.Match(message) ?? false)
                 return State.Create;
 
@@ -197,19 +236,21 @@
 
         public sealed class Keys
         {
-            public StateKeys Create { get; set; }
-            public StateKeys Read { get; set; }
-            public StateKeys Delete { get; set; }
-            public StateKeys List { get; set; }
-            
-            public IWords Error { get; set; }
+            public StateKeys Create { get; init; }
+            public StateKeys Read { get; init; }
+            public StateKeys Delete { get; init; }
+            public StateKeys List { get; init; }
+            public IWords Error { get; init; }
         }
 
         public sealed class StateKeys
         {
-            public IWords Keys { get; set; }
-            public IWords Start { get; set; }
-            public IWords Success { get; set; }
+            public IWords Keys { get; init; }
+            public IWords Start { get; init; }
+            public IWords Success { get; init; }
+            public IWords Next { get; init; }
+            public IWords Previous { get; init; }
+            public IWords Close { get; init; }
         }
     }
 }

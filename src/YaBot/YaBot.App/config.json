@@ -41,7 +41,22 @@
     "список"
   ],
   "PlaceCrudlState_List_Success": [
-    "Список мест:"
+    "Список мест"
+  ],
+  "PlaceCrudlState_List_Next": [
+    "next",
+    "дальше"
+  ],
+  "PlaceCrudlState_List_Previous": [
+    "prev",
+    "назад"
+  ],
+  "PlaceCrudlState_List_Close": [
+    "close",
+    "закрыть",
+    "отмена",
+    "выход",
+    "выйти"
   ],
   "PlaceCrudlState_Read_Keys": [
     "get",

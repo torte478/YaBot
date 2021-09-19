@@ -19,6 +19,12 @@
             f(x);
             return x;
         }
+
+        public static TFirst _<TFirst, TSecond>(this TFirst x, Action<TFirst, TSecond> a, TSecond y)
+        {
+            a(x, y);
+            return x;
+        }
         
         public static TOut If<TIn, TOut>(
             this TIn x, 

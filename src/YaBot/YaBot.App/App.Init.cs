@@ -19,7 +19,9 @@
 
     internal partial class App
     {
+        // TODO : to config
         private const string Version = "1.0.0";
+        private const int Pagination = 2;
         
         private const string ConfigPath = "config.json";
         private const string CredentialsPath = "credentials.json";
@@ -76,12 +78,16 @@
                             List =  new PlaceCrudlState.StateKeys
                             {
                                 Keys = config["PlaceCrudlState_List_Keys"],
-                                Success = config["PlaceCrudlState_List_Success"] 
+                                Success = config["PlaceCrudlState_List_Success"],
+                                Next = config["PlaceCrudlState_List_Next"],
+                                Previous = config["PlaceCrudlState_List_Previous"],
+                                Close = config["PlaceCrudlState_List_Close"],
                             },
                             Error = error
                         },
                         places,
-                        outputs
+                        outputs,
+                        new Page(Pagination).Create
                         ),
                     new GetRandomPlaceState(
                         config["GetRandomPlace_Keys"],
