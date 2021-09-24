@@ -49,7 +49,11 @@
 
             var error = config["Error"];
             var outputs = new OutputFactory();
-            
+
+            var stringPage = new StringPage<Place>(
+                new Page(Pagination).Create,
+                "{0}: {1}");
+
             var startState = new StartState(
                 config["Names"],
                 config["Ping"],
@@ -59,7 +63,7 @@
                         new PlaceCrudlState.Keys
                         {
                             Create = new PlaceCrudlState.StateKeys
-                            {   
+                            {
                                 Keys = config["PlaceCrudlState_Create_Keys"],
                                 Start = config["PlaceCrudlState_Create_Start"],
                                 Success = config["PlaceCrudlState_Create_Success"]
@@ -73,7 +77,7 @@
                             {
                                 Keys = config["PlaceCrudlState_Delete_Keys"],
                                 Start = config["PlaceCrudlState_Delete_Start"],
-                                Success = config["PlaceCrudlState_Delete_Success"] 
+                                Success = config["PlaceCrudlState_Delete_Success"]
                             },
                             List =  new PlaceCrudlState.StateKeys
                             {
@@ -87,8 +91,7 @@
                         },
                         places,
                         outputs,
-                        new Page(Pagination).Create
-                        ),
+                        stringPage.Paginate),
                     new GetRandomPlaceState(
                         config["GetRandomPlace_Keys"],
                         config["GetRandomPlace_Next"],

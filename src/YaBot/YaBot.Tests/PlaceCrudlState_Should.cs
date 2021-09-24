@@ -16,12 +16,9 @@
     internal sealed class PlaceCrudlState_Should
     {
         [Test]
-        public void SetHeaderToOwnLine_AfterListFormat()
+        public void SetHeaderToOwnLine_OnListOperation()
         {
-            var places = A.Fake<ICrudl<int, Place>>();
-            A.CallTo(() => places.Enumerate()).Returns(
-                Enumerable.Range(1, 3).Select(_ => A.Fake<Place>()));
-            var state = CreateForListTest(places);
+            var state = CreateForListTest(A.Fake<ICrudl<int, Place>>());
 
             // TODO : check first content, not count
             var count = state
@@ -29,7 +26,27 @@
                 .Split(Environment.NewLine)
                 .Length;
             
-            Assert.That(count, Is.EqualTo(6));
+            Assert.That(count, Is.EqualTo(5));
+        }
+
+        [Test]
+        public void PaginateNames_OnListOperation()
+        {
+            var place = A.Fake<Place>();
+            A.CallTo(() => place.Name).Returns("EXPECTED");
+
+            var places = A.Fake<ICrudl<int, Place>>();
+            A.CallTo(() => places.Enumerate())
+                .Returns(new[] { place });
+
+            var state = CreateForListTest(places);
+
+            var actual = state
+                ._(GetTextOutput, A.Fake<IInput>())
+                .Split(Environment.NewLine)
+                .Last();
+
+            Assert.That(actual, Is.EqualTo("1: EXPECTED"));
         }
 
         [Test]
@@ -50,35 +67,50 @@
             Assert.That(actual, Is.EqualTo("EXPECTED"));
         }
 
-        private static PlaceCrudlState CreateForReadTest(ICrudl<int, Place> places, int pagination = 100)
+        private static PlaceCrudlState CreateForReadTest(ICrudl<int, Place> places)
         {
             var keys = A.Fake<IWords>();
             A.CallTo(() => keys.Match(A<string>._)).Returns(true);
 
-            return new PlaceCrudlState(
+            return Create(
                 new PlaceCrudlState.Keys
                 {
                     Read = new PlaceCrudlState.StateKeys { Keys = keys }
                 },
-                places,
-                new OutputFactory(),
-                new Page(pagination).Create // TODO : wtf?
-            );
+                places);
         }
 
-        private static PlaceCrudlState CreateForListTest(ICrudl<int, Place> places, int pagination = 100)
+        private static PlaceCrudlState CreateForListTest(ICrudl<int, Place> places)
         {
             var keys = A.Fake<IWords>();
             A.CallTo(() => keys.Match(A<string>._)).Returns(true);
 
-            return new PlaceCrudlState(
+            return Create(
                 new PlaceCrudlState.Keys
                 {
                     List = new PlaceCrudlState.StateKeys { Keys = keys }
                 },
+                places);
+        }
+
+        private static PlaceCrudlState Create(PlaceCrudlState.Keys keys, ICrudl<int, Place> places)
+        {
+            return new(
+                keys,
                 places,
                 new OutputFactory(),
-                new Page(pagination).Create // TODO : wtf?
+                (_, _) => new Pagination<string>
+                {
+                    Start = 1,
+                    Finish = 2,
+                    Paginated = false,
+                    Total = 2,
+                    Items = new[]
+                    {
+                        (1, "first"),
+                        (2, "second")
+                    }
+                }
             );
         }
 

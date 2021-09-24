@@ -18,7 +18,7 @@
         private readonly Keys keys;
         private readonly ICrudl<int, Place> places;
         private readonly IOutputFactory<string, IWords, Place> outputs;
-        private readonly Func<IEnumerable<Place>, int, Pagination<Place>> paginate;
+        private readonly Func<IEnumerable<Place>, int, Pagination<string>> paginate;
 
         private State state;
 
@@ -30,7 +30,7 @@
             Keys keys, 
             ICrudl<int, Place> places, 
             IOutputFactory<string, IWords, Place> outputs,
-            Func<IEnumerable<Place>, int, Pagination<Place>> paginate)
+            Func<IEnumerable<Place>, int, Pagination<string>> paginate)
         {
             this.keys = keys;
             this.places = places;
@@ -170,15 +170,15 @@
                 ? $": {list.Start}..{list.Finish} из {list.Total}"
                 : string.Empty;
 
+            var header = new StringBuilder()
+                .Append(keys.List.Success.ToRandom())
+                .AppendLine(top)
+                .AppendLine();
+
             var result = list.Items
-                .Select(_ => _.Name)
-                .ToList()
-                .Select((x, i) => $"{i}. {x}")
+                .Select(_ => _.Item2)
                 .Aggregate(
-                    new StringBuilder()
-                            .Append(keys.List.Success.ToRandom())
-                            .AppendLine(top)
-                            .AppendLine(),
+                    header,
                     (acc, x) => acc.AppendLine(x))
                 .ToString()
                 ._(outputs.Create);

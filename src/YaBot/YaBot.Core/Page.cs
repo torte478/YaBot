@@ -18,7 +18,7 @@
             // TODO : optimize
             var total = items.Count();
             if (total == 0)
-                return new Pagination<T> { Items = Enumerable.Empty<T>() };
+                return new Pagination<T> { Items = Enumerable.Empty<(int, T)>() };
 
             var start = size * page;
             if (start >= total)
@@ -28,7 +28,10 @@
 
             return new Pagination<T>
             {
-                Items = items.Skip(start).Take(size),
+                Items = items
+                    .Skip(start)
+                    .Take(size)
+                    .Select((x, i) => (i, x)),
                 Start = start,
                 Finish = finish,
                 Total = total,
