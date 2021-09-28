@@ -50,7 +50,7 @@
             var error = config["Error"];
             var outputs = new OutputFactory();
 
-            var stringPage = new StringPage<Place>(
+            var stringPage = new StringPage<string>(
                 new Page(Pagination).Create,
                 "{0}: {1}");
 

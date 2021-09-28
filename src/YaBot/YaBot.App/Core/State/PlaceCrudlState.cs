@@ -18,7 +18,7 @@
         private readonly Keys keys;
         private readonly ICrudl<int, Place> places;
         private readonly IOutputFactory<string, IWords, Place> outputs;
-        private readonly Func<IEnumerable<Place>, int, Pagination<string>> paginate;
+        private readonly Func<IEnumerable<string>, int, Pagination<string>> paginate;
 
         private State state;
 
@@ -30,7 +30,7 @@
             Keys keys, 
             ICrudl<int, Place> places, 
             IOutputFactory<string, IWords, Place> outputs,
-            Func<IEnumerable<Place>, int, Pagination<string>> paginate)
+            Func<IEnumerable<string>, int, Pagination<string>> paginate)
         {
             this.keys = keys;
             this.places = places;
@@ -165,14 +165,18 @@
 
         private (IOutput, IState) RunList()
         {
-            var list = places.Enumerate()._(paginate, page);
-            var top = list.Paginated
+            var list = places
+                .Enumerate()
+                .Select(x => x.Name)
+                ._(paginate, page);
+
+            var interval = list.Paginated
                 ? $": {list.Start}..{list.Finish} из {list.Total}"
                 : string.Empty;
 
             var header = new StringBuilder()
                 .Append(keys.List.Success.ToRandom())
-                .AppendLine(top)
+                .AppendLine(interval)
                 .AppendLine();
 
             var result = list.Items

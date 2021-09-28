@@ -43,10 +43,10 @@
 
             var actual = state
                 ._(GetTextOutput, A.Fake<IInput>())
-                .Split(Environment.NewLine)
+                .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
                 .Last();
 
-            Assert.That(actual, Is.EqualTo("1: EXPECTED"));
+            Assert.That(actual, Is.EqualTo("EXPECTED"));
         }
 
         [Test]
@@ -99,17 +99,13 @@
                 keys,
                 places,
                 new OutputFactory(),
-                (_, _) => new Pagination<string>
+                (items, _) => new Pagination<string>
                 {
                     Start = 1,
                     Finish = 2,
                     Paginated = false,
                     Total = 2,
-                    Items = new[]
-                    {
-                        (1, "first"),
-                        (2, "second")
-                    }
+                    Items = items.Select(x => (-1, x))
                 }
             );
         }
