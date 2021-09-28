@@ -26,7 +26,7 @@
                 .Split(Environment.NewLine)
                 .Length;
             
-            Assert.That(count, Is.EqualTo(5));
+            Assert.That(count, Is.EqualTo(3));
         }
 
         [Test]
@@ -46,7 +46,42 @@
                 .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
                 .Last();
 
-            Assert.That(actual, Is.EqualTo("EXPECTED"));
+            Assert.That(actual.Contains("EXPECTED"), Is.True);
+        }
+
+        [Test]
+        public void IncrementIndices_OnListOperation()
+        {
+            var place = A.Fake<Place>();
+            A.CallTo(() => place.Name).Returns("EXPECTED");
+
+            var places = A.Fake<ICrudl<int, Place>>();
+            A.CallTo(() => places.Enumerate())
+                .Returns(new[] { place });
+
+            var state = CreateForListTest(places);
+
+            var actual = state
+                ._(GetTextOutput, A.Fake<IInput>())
+                .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
+                .Last();
+
+            Assert.That(actual, Is.EqualTo("43: EXPECTED"));
+        }
+
+        [Test]
+        public void IncrementIndicesAtHeader_OnListOperation()
+        {
+            var state = CreateForListTest(A.Fake<ICrudl<int, Place>>());
+
+            var actual = state
+                ._(GetTextOutput, A.Fake<IInput>())
+                .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
+                .First();
+
+            Assert.That(actual.Contains("1"), Is.False);
+            Assert.That(actual.Contains("2"), Is.True);
+            Assert.That(actual.Contains("3"), Is.True);
         }
 
         [Test]
@@ -103,9 +138,9 @@
                 {
                     Start = 1,
                     Finish = 2,
-                    Paginated = false,
-                    Total = 2,
-                    Items = items.Select(x => (-1, x))
+                    Paginated = true,
+                    Total = 3,
+                    Items = items.Select(x => (42, x))
                 }
             );
         }

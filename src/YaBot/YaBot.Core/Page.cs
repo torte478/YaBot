@@ -31,7 +31,7 @@
                 Items = items
                     .Skip(start)
                     .Take(size)
-                    .Select((x, i) => (i, x)),
+                    .Select((x, i) => (start + i, x)),
                 Start = start,
                 Finish = finish,
                 Total = total,

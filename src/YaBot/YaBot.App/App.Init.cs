@@ -50,10 +50,6 @@
             var error = config["Error"];
             var outputs = new OutputFactory();
 
-            var stringPage = new StringPage<string>(
-                new Page(Pagination).Create,
-                "{0}: {1}");
-
             var startState = new StartState(
                 config["Names"],
                 config["Ping"],
@@ -91,7 +87,7 @@
                         },
                         places,
                         outputs,
-                        stringPage.Paginate),
+                        new Page(Pagination).Create),
                     new GetRandomPlaceState(
                         config["GetRandomPlace_Keys"],
                         config["GetRandomPlace_Next"],

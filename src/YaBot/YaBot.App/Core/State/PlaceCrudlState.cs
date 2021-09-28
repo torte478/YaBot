@@ -171,7 +171,7 @@
                 ._(paginate, page);
 
             var interval = list.Paginated
-                ? $": {list.Start}..{list.Finish} из {list.Total}"
+                ? $": {list.Start + 1}..{list.Finish + 1} из {list.Total}"
                 : string.Empty;
 
             var header = new StringBuilder()
@@ -180,7 +180,7 @@
                 .AppendLine();
 
             var result = list.Items
-                .Select(_ => _.Item2)
+                .Select(_ => $"{_.Item1 + 1}: {_.Item2}")
                 .Aggregate(
                     header,
                     (acc, x) => acc.AppendLine(x))
