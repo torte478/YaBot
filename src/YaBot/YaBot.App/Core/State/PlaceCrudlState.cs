@@ -48,6 +48,7 @@
 
         public IState Reset()
         {
+            page = 0;
             state = State.Start;
             return this;
         }
@@ -72,7 +73,7 @@
                 State.Create => StartOperation(keys.Create, State.Create),
                 State.Read => StartOperation(keys.Read, State.Read),
                 State.Delete => StartOperation(keys.Delete, State.Delete),
-                State.List => RunList(),
+                State.List => RunList(page),
                 _ => (keys.Error.ToError("Не удалось выйти из начального состояния")._(outputs.Create), null) 
             };
         }
@@ -96,15 +97,17 @@
                 return (Undefined, "Необходимо ввести текстовое сообщение");
 
             var list = places.Enumerate().ToList();
-            var min = 0;
             var max = list.Count - 1;
-            
-            if (int.TryParse(text, out var index).Not()
-                || index < min
-                || index > max)
-                return (Undefined, $"Неправильный формат. Нужно ввести число в диапазоне {min + 1} - {max + 1}");
 
-            return (index + 1, null);
+            var parsed = int.TryParse(text, out var index);
+            --index;
+
+            if (parsed.Not()
+                || index < 0
+                || index > max)
+                return (Undefined, $"Неправильный формат. Нужно ввести число в диапазоне 1 - {max + 1}");
+
+            return (index, null);
         }
 
         private (IOutput, IState) RunRead(IInput input)
@@ -143,32 +146,26 @@
         private (IOutput, IState) RunList(IInput input)
         {
             if (keys.List.Next.Match(input.Text))
-            {
-                ++page;
-                return RunList();
-            }
+                return RunList(page + 1);
 
             if (keys.List.Previous.Match(input.Text))
-            {
-                --page;
-                return RunList();
-            }
+                return RunList(page - 1);
 
             if (keys.List.Close.Match(input.Text))
             {
-                page = 0;
+                Reset();
                 return (null, null);
             }
 
             return (null, this);
         }
 
-        private (IOutput, IState) RunList()
+        private (IOutput, IState) RunList(int index)
         {
             var pagination = places
                 .Enumerate()
                 .Select(x => x.Name)
-                ._(paginate, page);
+                ._(paginate, index);
 
             page = pagination.Index;
 
