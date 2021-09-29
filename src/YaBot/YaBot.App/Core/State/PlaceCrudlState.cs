@@ -102,9 +102,9 @@
             if (int.TryParse(text, out var index).Not()
                 || index < min
                 || index > max)
-                return (Undefined, $"Неправильный формат. Нужно ввести число в диапазоне {min} - {max}");
+                return (Undefined, $"Неправильный формат. Нужно ввести число в диапазоне {min + 1} - {max + 1}");
 
-            return (index, null);
+            return (index + 1, null);
         }
 
         private (IOutput, IState) RunRead(IInput input)
@@ -150,7 +150,7 @@
 
             if (keys.List.Previous.Match(input.Text))
             {
-                page = Math.Max(0, page - 1);
+                --page;
                 return RunList();
             }
 
@@ -165,13 +165,15 @@
 
         private (IOutput, IState) RunList()
         {
-            var list = places
+            var pagination = places
                 .Enumerate()
                 .Select(x => x.Name)
                 ._(paginate, page);
 
-            var interval = list.Paginated
-                ? $": {list.Start + 1}..{list.Finish + 1} из {list.Total}"
+            page = pagination.Index;
+
+            var interval = pagination.Paginated
+                ? $": {pagination.Start + 1}..{pagination.Finish + 1} из {pagination.Total}"
                 : string.Empty;
 
             var header = new StringBuilder()
@@ -179,7 +181,7 @@
                 .AppendLine(interval)
                 .AppendLine();
 
-            var result = list.Items
+            var result = pagination.Items
                 .Select(_ => $"{_.Item1 + 1}: {_.Item2}")
                 .Aggregate(
                     header,

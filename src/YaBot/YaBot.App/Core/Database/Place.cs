@@ -2,7 +2,6 @@
 
 namespace YaBot.App.Core.Database
 {
-    using YaBot.Core;
     using YaBot.Core.Database;
 
     public partial class Place : IHasId<int>
