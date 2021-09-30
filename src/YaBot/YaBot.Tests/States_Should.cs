@@ -1,12 +1,12 @@
 ﻿namespace YaBot.Tests
 {
+    using System;
     using App.Core;
     using App.Core.State;
-    using App.Extensions;
     using App.TelegramApi;
     using FakeItEasy;
     using NUnit.Framework;
-    using YaBot.Core;
+    using Telegram.Bot.Types;
     using YaBot.Core.Extensions;
     using YaBot.Core.IO;
 
@@ -21,7 +21,7 @@
             var stoppers = A.Fake<IWords>();
             var changeState = A.Fake<IInput>();
             var reset = A.Fake<IInput>();
-            var outputs = new OutputFactory();
+            var outputs = new OutputFactory(_ => (_, Array.Empty<MessageEntity>())); //TODO: dependency
 
             A.CallTo(() => stoppers.Match(reset.Text)).Returns(true);
             A.CallTo(() => start.Process(A<IInput>._)).Returns(("start"._(outputs.Create), next));

@@ -6,11 +6,10 @@
     using App.Core;
     using App.Core.Database;
     using App.Core.State;
-    using App.Extensions;
     using App.TelegramApi;
     using FakeItEasy;
     using NUnit.Framework;
-    using YaBot.Core;
+    using Telegram.Bot.Types;
     using YaBot.Core.Extensions;
     using YaBot.Core.IO;
 
@@ -81,7 +80,11 @@
             A.CallTo(() => keys.Match(A<string>._)).Returns(false);
             var words = A.Fake<IWords>();
             A.CallTo(() => words.Match(A<string>._)).Returns(true);
-            return new(keys, words, getPlaces, new OutputFactory());
+            return new GetRandomPlaceState(
+                keys,
+                words,
+                getPlaces,
+                new OutputFactory(_ => (_, Array.Empty<MessageEntity>()))); //TODO : dependency
         }
     }
 }

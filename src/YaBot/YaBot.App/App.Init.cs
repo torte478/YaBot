@@ -21,7 +21,7 @@
     {
         // TODO : to config
         private const string Version = "1.0.0";
-        private const int Pagination = 2;
+        private const int Pagination = 20;
         
         private const string ConfigPath = "config.json";
         private const string CredentialsPath = "credentials.json";
@@ -48,7 +48,9 @@
             var places = new Crudl<Context, Place>(context, _ => _.Places);
 
             var error = config["Error"];
-            var outputs = new OutputFactory();
+
+            var formattedText = new FormattedText("**");
+            var outputs = new OutputFactory(formattedText.Deserialize);
 
             var startState = new StartState(
                 config["Names"],
@@ -112,7 +114,10 @@
                 begin: DateTime.UtcNow,
                 log);
 
-            var handler = new Handler(Input.CreateAsync, bot.Receive, log);
+            var handler = new Handler(
+                new InputFactory(formattedText.Serialize).CreateAsync,
+                bot.Receive,
+                log);
 
             return new App(
                 new TelegramBotClient(credentials.Telegram),

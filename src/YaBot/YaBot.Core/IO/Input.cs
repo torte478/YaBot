@@ -10,44 +10,12 @@
 
     public sealed class Input : IInput
     {
-        public DateTime Date { get; private init; }
-        public long Chat { get; private init;}
+        public DateTime Date { get; init; }
+        public long Chat { get; init;}
         
-        public string Text { get; private set;}
-        public byte[] Image { get; private set;}
+        public string Text { get; set;}
+        public byte[] Image { get; set;}
         
         public bool IsImage => Image != null;
-
-        private Input() {}
-        
-        public static async Task<IInput> CreateAsync(ITelegramBotClient client, Update update, CancellationToken cancellation)
-        {
-            var input = new Input
-            {
-                Date = update.Message.Date,
-                Chat = update.Message.Chat.Id,
-            };
-
-            if (update.Message.Text != null)
-            {
-                input.Text = update.Message.Text;
-            }
-
-            if (update.Message.Photo != null)
-            {
-                var photo = update.Message.Photo
-                    .OrderByDescending(_ => _.Width * _.Height)
-                    .First();
-                    
-                await using var stream = new MemoryStream();
-                await client.GetInfoAndDownloadFileAsync(photo.FileId, stream, cancellation)
-                    .ConfigureAwait(false);
-
-                input.Image = stream.ToArray();
-                input.Text = update.Message.Caption;
-            }
-
-            return input;
-        }
     }
 }

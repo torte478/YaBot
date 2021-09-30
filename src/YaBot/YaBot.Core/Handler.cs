@@ -73,6 +73,7 @@
                 await client.SendTextMessageAsync(
                     chat, 
                     output.Text,
+                    entities: output.MessageEntities,
                     cancellationToken: cancellation)
                 .ConfigureAwait(false);
             }

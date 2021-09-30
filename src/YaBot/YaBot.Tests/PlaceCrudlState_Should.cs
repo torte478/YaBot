@@ -8,6 +8,7 @@
     using App.TelegramApi;
     using FakeItEasy;
     using NUnit.Framework;
+    using Telegram.Bot.Types;
     using YaBot.Core;
     using YaBot.Core.Extensions;
     using YaBot.Core.IO;
@@ -161,7 +162,7 @@
             return new(
                 keys,
                 places,
-                new OutputFactory(),
+                new OutputFactory(_ => (_, Array.Empty<MessageEntity>())), // TODO : dependency
                 (items, _) => new Pagination<string>
                 {
                     Start = 1,

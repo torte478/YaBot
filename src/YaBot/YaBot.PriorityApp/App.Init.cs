@@ -42,7 +42,10 @@
                 begin: DateTime.UtcNow,
                 Console.WriteLine);
 
-            var handler = new Handler(Input.CreateAsync, bot.Receive, Log);
+            var handler = new Handler(
+                new InputFactory(new FormattedText("**").Serialize).CreateAsync,
+                bot.Receive,
+                Log);
 
             return new App(
                 new TelegramBotClient(credentials.Telegram),
