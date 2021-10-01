@@ -1,8 +1,6 @@
 ﻿namespace YaBot.App.TelegramApi
 {
     using System;
-    using System.Collections.Immutable;
-    using System.Linq;
     using Core;
     using Core.Database;
     using Core.Outputs;
@@ -51,6 +49,7 @@
             return new Output
             {
                 Text = input.Name,
+                MessageEntities = entities,
                 Image = input.Image
             };
         }

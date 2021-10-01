@@ -1,7 +1,6 @@
 ﻿namespace YaBot.Tests
 {
     using System;
-    using App.Core.Outputs;
     using NUnit.Framework;
     using YaBot.Core.IO;
 
