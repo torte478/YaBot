@@ -1,12 +1,15 @@
 ﻿namespace YaBot.Tests
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using FakeItEasy;
     using NUnit.Framework;
+    using Telegram.Bot;
     using Telegram.Bot.Types;
     using YaBot.Core;
     using YaBot.Core.IO;
+    using static System.Threading.Tasks.Task;
 
     [TestFixture]
     internal sealed class Handler_Should
@@ -20,7 +23,7 @@
             receiver = new FakeReceiver();
 
             handler = new Handler(
-                (_, _, _) => Task.Run(A.Fake<IInput>),
+                (_, _, _) => Run(A.Fake<IInput>),
                 receiver.Receive,
                 _ => { }
             );
@@ -59,6 +62,30 @@
             await handler.HandleUpdateAsync(null, update, new CancellationToken());
 
             Assert.That(receiver.Called, Is.False);
+        }
+
+        [Test]
+        public void CatchExceptions_FromHandleUpdate()
+        {
+            var actual = string.Empty;
+            Action<string> log = _ =>
+            {
+                actual = _;
+            };
+
+            var instance = new Handler(
+                (_, _, _) => Run(() =>
+                {
+                    throw new Exception("EXPECTED");
+                    return A.Fake<IInput>();
+                }),
+                _ => null,
+                log);
+
+            Assert.ThrowsAsync<Exception>(() =>
+                instance.HandleUpdateAsync(null, new Update {Message = new Message()}, new CancellationToken()));
+
+            Assert.That(actual.Contains("EXPECTED"), Is.True);
         }
 
         private class FakeReceiver

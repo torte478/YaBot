@@ -34,15 +34,26 @@
 
         public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            if (update?.Message is not {ForwardFrom: null})
-                return;
+            try
+            {
+                if (update?.Message is not {ForwardFrom: null})
+                    return;
 
-            log($"=> {update.Message?.Text ?? "?"}");
+                log($"=> {update.Message?.Text ?? "?"}");
 
-            var output = toInputAsync(botClient, update, cancellationToken).Result
-                ._(receive);
+                var input = await toInputAsync(botClient, update, cancellationToken)
+                    .ConfigureAwait(false);
 
-            await SendAsync(botClient, update.Message.Chat, output, cancellationToken);
+                var output = receive(input);
+
+                await SendAsync(botClient, update.Message.Chat, output, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                log(ex.ToString());
+                throw;
+            }
         }
 
         public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
