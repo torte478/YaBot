@@ -1,13 +1,16 @@
 ﻿namespace YaBot.PriorityApp
 {
     using System;
+    using System.Collections.Immutable;
     using System.Threading;
     using Newtonsoft.Json;
     using Telegram.Bot;
+    using Telegram.Bot.Types.Enums;
     using YaBot.Core;
     using YaBot.Core.Database;
     using YaBot.Core.Extensions;
     using YaBot.Core.IO;
+    using YaBot.Core.IO.Format;
     using YaBot.PriorityApp.Database;
     using YaBot.PriorityApp.Tree;
     using File = System.IO.File;
@@ -43,7 +46,11 @@
                 Console.WriteLine);
 
             var handler = new Handler(
-                new InputFactory(new FormattedText("**").Serialize).CreateAsync,
+                new InputFactory(
+                    new FormattedText(
+                        ImmutableDictionary<MessageEntityType, IToken>.Empty
+                        ).Serialize)
+                    .CreateAsync,
                 bot.Receive,
                 Log);
 

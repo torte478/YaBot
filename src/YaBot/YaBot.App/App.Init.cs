@@ -10,11 +10,13 @@
     using Core.State;
     using Newtonsoft.Json;
     using Telegram.Bot;
+    using Telegram.Bot.Types.Enums;
     using TelegramApi;
     using YaBot.Core;
     using YaBot.Core.Database;
     using YaBot.Core.Extensions;
     using YaBot.Core.IO;
+    using YaBot.Core.IO.Format;
     using File = System.IO.File;
 
     internal partial class App
@@ -49,7 +51,13 @@
 
             var error = config["Error"];
 
-            var formattedText = new FormattedText("**");
+            var formattedText = new FormattedText(new Dictionary<MessageEntityType, IToken>
+                {
+                    // TODO : concat key and impl
+                    { MessageEntityType.Bold, new BoldToken("**") },
+                    { MessageEntityType.TextLink, new LinkToken("^^", "|") }
+                }
+                .ToImmutableDictionary());
             var outputs = new OutputFactory(formattedText.Deserialize);
 
             var startState = new StartState(
