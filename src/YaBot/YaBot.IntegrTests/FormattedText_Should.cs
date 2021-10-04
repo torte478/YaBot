@@ -20,7 +20,7 @@
             formattedText = new FormattedText(new Dictionary<MessageEntityType, IToken>
                 {
                     { MessageEntityType.Bold, new BoldToken("**") },
-                    { MessageEntityType.TextLink, new LinkToken("^^", "|") }
+                    { MessageEntityType.TextLink, new TextLinkToken("^^", "|") }
                 }
                 .ToImmutableDictionary());
         }

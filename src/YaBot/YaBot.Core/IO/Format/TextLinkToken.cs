@@ -4,18 +4,20 @@
     using Telegram.Bot.Types;
     using Telegram.Bot.Types.Enums;
 
-    public sealed class BoldToken : IToken
+    public sealed class TextLinkToken : IToken
     {
         private readonly string border;
+        private readonly string delimiter;
 
-        public BoldToken(string border)
+        public TextLinkToken(string border, string delimiter)
         {
             this.border = border;
+            this.delimiter = delimiter;
         }
 
         public string Serialize(MessageEntity entity, string text)
         {
-            return $"{border}{text}{border}";
+            return $"{border}{text}{delimiter}{entity.Url}{border}";
         }
 
         public  IEnumerable<(string, MessageEntity)> Deserialize(string text)
@@ -24,20 +26,23 @@
 
             for (var i = 0; i < tokens.Length; ++i)
             {
-                MessageEntity entity = null;
-
                 if (i % 2 == 1)
                 {
-                    entity = new MessageEntity
-                    {
-                        Type = MessageEntityType.Bold
-                    };
-                }
+                    var link = tokens[i].Split(delimiter);
 
-                yield return (tokens[i], entity);
+                    var entity = new MessageEntity
+                    {
+                        Type = MessageEntityType.TextLink,
+                        Url = link[1]
+                    };
+
+                    yield return (link[0], entity);
+                }
+                else
+                {
+                    yield return (tokens[i], null);
+                }
             }
         }
     }
-
-    // TODO : duplicate of Bold (and textlink)
 }

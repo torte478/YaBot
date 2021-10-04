@@ -55,7 +55,8 @@
                 {
                     // TODO : concat key and impl
                     { MessageEntityType.Bold, new BoldToken("**") },
-                    { MessageEntityType.TextLink, new LinkToken("^^", "|") }
+                    { MessageEntityType.Italic, new ItalicToken("~~") },
+                    { MessageEntityType.TextLink, new TextLinkToken("^^", "|") }
                 }
                 .ToImmutableDictionary());
             var outputs = new OutputFactory(formattedText.Deserialize);

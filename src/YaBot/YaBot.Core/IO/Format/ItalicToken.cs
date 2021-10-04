@@ -4,20 +4,18 @@
     using Telegram.Bot.Types;
     using Telegram.Bot.Types.Enums;
 
-    public sealed class LinkToken : IToken
+    public sealed class ItalicToken : IToken
     {
         private readonly string border;
-        private readonly string delimiter;
 
-        public LinkToken(string border, string delimiter)
+        public ItalicToken(string border)
         {
             this.border = border;
-            this.delimiter = delimiter;
         }
 
         public string Serialize(MessageEntity entity, string text)
         {
-            return $"{border}{text}{delimiter}{entity.Url}{border}";
+            return $"{border}{text}{border}";
         }
 
         public  IEnumerable<(string, MessageEntity)> Deserialize(string text)
@@ -26,22 +24,17 @@
 
             for (var i = 0; i < tokens.Length; ++i)
             {
+                MessageEntity entity = null;
+
                 if (i % 2 == 1)
                 {
-                    var link = tokens[i].Split(delimiter);
-
-                    var entity = new MessageEntity
+                    entity = new MessageEntity
                     {
-                        Type = MessageEntityType.TextLink,
-                        Url = link[1]
+                        Type = MessageEntityType.Italic
                     };
+                }
 
-                    yield return (link[0], entity);
-                }
-                else
-                {
-                    yield return (tokens[i], null);
-                }
+                yield return (tokens[i], entity);
             }
         }
     }
