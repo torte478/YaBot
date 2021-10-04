@@ -22,7 +22,7 @@
         {
             receiver = new FakeReceiver();
 
-            handler = new Handler(
+            handler = Create(
                 (_, _, _) => Run(A.Fake<IInput>),
                 receiver.Receive,
                 _ => { }
@@ -73,7 +73,7 @@
                 actual = _;
             };
 
-            var instance = new Handler(
+            var instance = Create(
                 (_, _, _) => Run(() =>
                 {
                     throw new Exception("EXPECTED");
@@ -86,6 +86,33 @@
                 instance.HandleUpdateAsync(null, new Update {Message = new Message()}, new CancellationToken()));
 
             Assert.That(actual.Contains("EXPECTED"), Is.True);
+        }
+
+        [Test]
+        public async Task DoNotWriteArrow_WhenLogInputMessage()
+        {
+            var actual = string.Empty;
+            Action<string> log = _ =>
+            {
+                actual = _;
+            };
+
+            var instance = Create(
+                (_, _, _) => Run(A.Fake<IInput>),
+                _ => null,
+                log);
+
+            await instance.HandleUpdateAsync(null, new Update {Message = new Message()}, new CancellationToken());
+
+            Assert.That(actual.Contains("=>"), Is.False);
+        }
+
+        private static Handler Create(
+            Func<ITelegramBotClient, Update, CancellationToken, Task<IInput>> toInputAsync,
+            Func<IInput, IOutput> receive,
+            Action<string> log)
+        {
+            return new Handler(toInputAsync, receive, log);
         }
 
         private class FakeReceiver

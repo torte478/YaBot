@@ -19,6 +19,8 @@
         private readonly Action<string> log;
 
 #pragma warning disable 8632
+        // ReSharper disable once UnusedMember.Global
+        // ReSharper disable once UnassignedGetOnlyAutoProperty
         public UpdateType[]? AllowedUpdates { get; }
 #pragma warning restore 8632
 
@@ -39,7 +41,7 @@
                 if (update?.Message is not {ForwardFrom: null})
                     return;
 
-                log($"=> {update.Message?.Text ?? "?"}");
+                log($"{update.Message?.Text ?? "?"}");
 
                 var input = await toInputAsync(botClient, update, cancellationToken)
                     .ConfigureAwait(false);
