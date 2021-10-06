@@ -86,34 +86,6 @@
         }
 
         [Test]
-        public void ResetState_AfterListClose()
-        {
-            var enable = A.Fake<IWords>();
-            A.CallTo(() => enable.Match(A<string>._)).Returns(true);
-            var disable = A.Fake<IWords>();
-            A.CallTo(() => disable.Match(A<string>._)).Returns(false);
-            var keys = new PlaceCrudlState.Keys
-            {
-                List = new PlaceCrudlState.StateKeys
-                {
-                    Keys = enable,
-                    Close = enable,
-                    Next = disable,
-                    Previous = disable,
-                }
-            };
-            var places = A.Fake<ICrudl<int, Place>>();
-            A.CallTo(() => places.Enumerate()).Returns(new[] {A.Fake<Place>()});
-            var state = Create(keys, places);
-
-            var expected = state._(GetTextOutput, A.Fake<IInput>());
-            state.Process(A.Fake<IInput>());
-            var actual = state._(GetTextOutput, A.Fake<IInput>());
-
-            Assert.That(actual, Is.EqualTo(expected));
-        }
-
-        [Test]
         public void UseMetaIndices_OnReadOperation()
         {
             var place = new Place { Id = 42, Name = "EXPECTED" };

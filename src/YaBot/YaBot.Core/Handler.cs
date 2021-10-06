@@ -41,8 +41,9 @@
                 if (update?.Message is not {ForwardFrom: null})
                     return;
 
+#if DEBUG
                 log($"{update.Message?.Text ?? "?"}");
-
+#endif
                 var input = await toInputAsync(botClient, update, cancellationToken)
                     .ConfigureAwait(false);
 

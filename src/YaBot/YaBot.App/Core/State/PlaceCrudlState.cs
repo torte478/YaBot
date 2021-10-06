@@ -60,23 +60,26 @@
         {
             return state switch
             {
-                State.Start => StartOperation(input),
+                State.Start => ProcessInnerState(input),
                 State.Create => RunCreate(input),
                 State.Read => RunRead(input),
                 State.Delete => RunDelete(input),
-                State.List => RunList(input),
                 _ => (keys.Error.ToError("Неизвестное состояние")._(outputs.Create), null)
             };
         }
 
-        private (IOutput, IState) StartOperation(IInput input)
+        private (IOutput, IState) ProcessInnerState(IInput input)
         {
             return Match(input.Text) switch
             {
                 State.Create => StartOperation(keys.Create, State.Create),
                 State.Read => StartOperation(keys.Read, State.Read),
                 State.Delete => StartOperation(keys.Delete, State.Delete),
-                State.List => RunList(page),
+
+                State.List => ShowPage(page),
+                State.Previous => ShowPage(page - 1),
+                State.Next => ShowPage(page + 1),
+
                 _ => (keys.Error.ToError("Не удалось выйти из начального состояния")._(outputs.Create), null) 
             };
         }
@@ -146,24 +149,7 @@
             return (key.Start._(outputs.Create), this);
         }
 
-        private (IOutput, IState) RunList(IInput input)
-        {
-            if (keys.List.Next.Match(input.Text))
-                return RunList(page + 1);
-
-            if (keys.List.Previous.Match(input.Text))
-                return RunList(page - 1);
-
-            if (keys.List.Close.Match(input.Text))
-            {
-                Reset();
-                return (null, null);
-            }
-
-            return (null, this);
-        }
-
-        private (IOutput, IState) RunList(int index)
+        private (IOutput, IState) ShowPage(int index)
         {
             var pagination = places
                 .Enumerate()
@@ -218,6 +204,12 @@
             if (keys.List?.Keys.Match(message) ?? false)
                 return State.List;
 
+            if (keys.List?.Next.Match(message) ?? false)
+                return State.Next;
+
+            if (keys.List?.Previous.Match(message) ?? false)
+                return State.Previous;
+
             return State.Unknown;
         }
 
@@ -237,7 +229,9 @@
             Create,
             Read,
             Delete,
-            List
+            List,
+            Next,
+            Previous
         }
 
         public sealed class Keys
@@ -256,7 +250,6 @@
             public IWords Success { get; init; }
             public IWords Next { get; init; }
             public IWords Previous { get; init; }
-            public IWords Close { get; init; }
         }
     }
 }

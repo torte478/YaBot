@@ -91,8 +91,7 @@
                                 Keys = config["PlaceCrudlState_List_Keys"],
                                 Success = config["PlaceCrudlState_List_Success"],
                                 Next = config["PlaceCrudlState_List_Next"],
-                                Previous = config["PlaceCrudlState_List_Previous"],
-                                Close = config["PlaceCrudlState_List_Close"],
+                                Previous = config["PlaceCrudlState_List_Previous"]
                             },
                             Error = error
                         },
