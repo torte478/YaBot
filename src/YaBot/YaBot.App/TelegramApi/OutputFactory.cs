@@ -48,7 +48,7 @@
             var (text, entities) = input.Name._(deserialize);
             return new Output
             {
-                Text = input.Name,
+                Text = text,
                 MessageEntities = entities,
                 Image = input.Image
             };

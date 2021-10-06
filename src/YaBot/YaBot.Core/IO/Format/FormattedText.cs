@@ -55,13 +55,6 @@
             return result.ToString();
         }
 
-        private string Serialize(string text, MessageEntity entity)
-        {
-            return formats.TryGetValue(entity.Type, out var format)
-                ? format.Serialize(entity, text)
-                : text;
-        }
-
         public (string, MessageEntity[]) Deserialize(string text)
         {
             (string token, MessageEntity entity) seed = (token: text, null);

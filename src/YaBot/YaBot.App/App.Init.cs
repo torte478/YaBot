@@ -98,7 +98,11 @@
                         },
                         places,
                         outputs,
-                        new Page(Pagination).Create),
+                        new Page(Pagination).Create,
+                        new Title(
+                            50, //TODO : to config
+                            _ => formattedText.Deserialize(_).Item1)
+                            .Create),
                     new GetRandomPlaceState(
                         config["GetRandomPlace_Keys"],
                         config["GetRandomPlace_Next"],

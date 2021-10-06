@@ -170,7 +170,8 @@
                     Paginated = true,
                     Total = 3,
                     Items = items.Select(x => (42, x))
-                }
+                },
+                _ => _
             );
         }
 
