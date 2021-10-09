@@ -175,8 +175,7 @@
                 .ToString()
                 ._(outputs.Create);
 
-            state = State.List;
-            return (result, this);
+            return (result, null);
         }
 
         private static Place GetPlace(IInput input)

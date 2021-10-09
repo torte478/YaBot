@@ -1,6 +1,7 @@
 ﻿namespace YaBot.Tests
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using App.Core;
     using App.Core.Database;
@@ -86,6 +87,40 @@
         }
 
         [Test]
+        public void NotChangeState_AfterListOperation()
+        {
+            var keys = A.Fake<IWords>();
+            A.CallTo(() => keys.Match(A<string>._, false)).Returns(true);
+
+            IEnumerable<string> text = new[] { "ERROR" };
+            var error = A.Fake<IWords>();
+            A.CallTo(() => error.GetEnumerator()).Returns(text.GetEnumerator());
+
+            var state = Create(new PlaceCrudlState.Keys
+                {
+                    List = new PlaceCrudlState.StateKeys { Keys = keys },
+                    Error = error
+                },
+                A.Fake<ICrudl<int, Place>>());
+
+            state.Process(A.Fake<IInput>());
+             var (actual, _) = state.Process(A.Fake<IInput>());
+
+            Assert.That(actual.Text.Contains("ERROR"), Is.False);
+        }
+
+        [Test]
+        public void CloseState_AfterListOperation()
+        {
+            var state = CreateForListTest(A.Fake<ICrudl<int, Place>>());
+
+            state.Process(A.Fake<IInput>());
+            var (_, actual) = state.Process(A.Fake<IInput>());
+
+            Assert.That(actual, Is.Null);
+        }
+
+        [Test]
         public void UseMetaIndices_OnReadOperation()
         {
             var place = new Place { Id = 42, Name = "EXPECTED" };
@@ -106,7 +141,7 @@
         private static PlaceCrudlState CreateForReadTest(ICrudl<int, Place> places)
         {
             var keys = A.Fake<IWords>();
-            A.CallTo(() => keys.Match(A<string>._)).Returns(true);
+            A.CallTo(() => keys.Match(A<string>._, false)).Returns(true);
 
             return Create(
                 new PlaceCrudlState.Keys
@@ -119,7 +154,7 @@
         private static PlaceCrudlState CreateForListTest(ICrudl<int, Place> places)
         {
             var keys = A.Fake<IWords>();
-            A.CallTo(() => keys.Match(A<string>._)).Returns(true);
+            A.CallTo(() => keys.Match(A<string>._, false)).Returns(true);
 
             return Create(
                 new PlaceCrudlState.Keys

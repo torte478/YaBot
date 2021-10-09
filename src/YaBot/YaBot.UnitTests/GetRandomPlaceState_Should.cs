@@ -77,9 +77,9 @@
         private static GetRandomPlaceState Create(Func<IEnumerable<Place>> getPlaces)
         {
             var keys = A.Fake<IWords>();
-            A.CallTo(() => keys.Match(A<string>._)).Returns(false);
+            A.CallTo(() => keys.Match(A<string>._, false)).Returns(false);
             var words = A.Fake<IWords>();
-            A.CallTo(() => words.Match(A<string>._)).Returns(true);
+            A.CallTo(() => words.Match(A<string>._, false)).Returns(true);
             return new GetRandomPlaceState(
                 keys,
                 words,

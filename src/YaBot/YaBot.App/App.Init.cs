@@ -23,7 +23,7 @@
     {
         // TODO : to config
         private const string Version = "1.0.0";
-        private const int Pagination = 20;
+        private const int Pagination = 2;
         
         private const string ConfigPath = "config.json";
         private const string CredentialsPath = "credentials.json";

@@ -1,6 +1,7 @@
 ﻿namespace YaBot.Tests
 {
     using System;
+    using System.Collections.Immutable;
     using App.Core;
     using App.Core.State;
     using App.TelegramApi;
@@ -23,13 +24,14 @@
             var reset = A.Fake<IInput>();
             var outputs = new OutputFactory(_ => (_, Array.Empty<MessageEntity>())); //TODO: dependency
 
-            A.CallTo(() => stoppers.Match(reset.Text)).Returns(true);
+            A.CallTo(() => stoppers.Match(reset.Text, false)).Returns(true);
             A.CallTo(() => start.Process(A<IInput>._)).Returns(("start"._(outputs.Create), next));
             A.CallTo(() => next.Process(A<IInput>._)).Returns(("next"._(outputs.Create), next));
 
             var states = new States(
                 string.Empty,
-                start, 
+                start,
+                ImmutableArray<IState>.Empty,
                 stoppers, 
                 A.Fake<IWords>(),
                 A.Fake<IWords>(),
