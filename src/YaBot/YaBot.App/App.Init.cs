@@ -137,8 +137,12 @@
                 new IState[]
                 {
                     new AufState(
-                        config["Auf_Key"],
-                        config["Auf_Success"],
+                        config["Auf_Auf_Key"],
+                        config["Auf_Auf_Success"],
+                        outputs),
+                    new AufState(
+                        config["Auf_Work_Key"],
+                        config["Auf_Work_Success"],
                         outputs)
                 }
                     .ToImmutableArray(),
