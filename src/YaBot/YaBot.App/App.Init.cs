@@ -123,7 +123,12 @@
                         places.Enumerate,
                         outputs
                         ),
-                    new WhoQuestionState(config["Question_Success"],
+                    new OrQuestionState(
+                        config["Question_Success"],
+                        outputs,
+                        () => random.Next(2)),
+                    new WhoQuestionState(
+                        config["Question_Success"],
                         config["WhoQuestion_Answers"],
                         outputs),
                     new QuestionState(

@@ -4,6 +4,7 @@
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
+    using Newtonsoft.Json;
     using Telegram.Bot;
     using Telegram.Bot.Extensions.Polling;
     using Telegram.Bot.Types;
@@ -55,6 +56,7 @@
             catch (Exception ex)
             {
                 log(ex.ToString());
+                log(update._(JsonConvert.SerializeObject));
                 throw;
             }
         }
