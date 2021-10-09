@@ -2,6 +2,7 @@
 
 namespace YaBot.PriorityApp.Database
 {
+    using YaBot.Core;
     using YaBot.Core.Database;
 
     public partial class Objective : IHasId<int>

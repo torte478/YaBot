@@ -60,6 +60,21 @@
                 }
                 .ToImmutableDictionary());
             var outputs = new OutputFactory(formattedText.Deserialize);
+            var random = new Random(DateTime.Now.Millisecond);
+
+            var nounCache = new RandomCrudlCache<int, Noun>(
+                (x, y)=> random.Next(x, y + 1),
+                new Crudl<Context,Noun>(
+                    context,
+                    _ => _.Nouns),
+                new RandomCrudlCache<int, Noun>.Args
+                {
+                    // TODO : to config
+                    Min = 1,
+                    Max = 2,
+                    Count = 2,
+                    Limit = 1000
+                });
 
             var startState = new StartState(
                 config["Names"],
@@ -111,7 +126,7 @@
                     new QuestionState(
                         config["Question_Success"],
                         outputs,
-                        () => DateTime.Now.Millisecond % 2 == 0 ? "FIRST" : "SECOND")
+                        () => nounCache.Next().Text)
                 }
                 .ToImmutableArray(),
                 outputs.Create);

@@ -1,4 +1,4 @@
-﻿namespace YaBot.Core.Database
+﻿namespace YaBot.Core
 {
     public interface IHasId<out T>
     {
