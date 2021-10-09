@@ -23,7 +23,7 @@
     {
         // TODO : to config
         private const string Version = "1.0.0";
-        private const int Pagination = 2;
+        private const int Pagination = 20;
         
         private const string ConfigPath = "config.json";
         private const string CredentialsPath = "credentials.json";
@@ -107,7 +107,11 @@
                         config["GetRandomPlace_Next"],
                         places.Enumerate,
                         outputs
-                        )
+                        ),
+                    new QuestionState(
+                        config["Question_Success"],
+                        outputs,
+                        () => DateTime.Now.Millisecond % 2 == 0 ? "FIRST" : "SECOND")
                 }
                 .ToImmutableArray(),
                 outputs.Create);
