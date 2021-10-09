@@ -115,6 +115,14 @@
             States CreateStates() => new States(
                 Version,
                 startState, 
+                new IState[]
+                {
+                    new AufState(
+                        config["Auf_Key"],
+                        config["Auf_Success"],
+                        outputs)
+                }
+                    .ToImmutableArray(),
                 config["Reset"],
                 config["Auf"],
                 config["Status"],

@@ -21,10 +21,15 @@
             this.keys = keys;
         }
 
-        public bool Match(string text)
+        public bool Match(string text, bool substring)
         {
-            return text != null
-                   && text._(Parse).Any(keys.Contains);
+            if (text == null)
+                return false;
+
+            var lower = text.ToLower();
+            return substring
+                ? keys.Any(lower.Contains)
+                : lower._(Parse).Any(keys.Contains);
         }
         
         public IEnumerator<string> GetEnumerator()
@@ -39,8 +44,9 @@
 
         private static IEnumerable<string> Parse(string text)
         {
+            // TODO : refactor
             var result = new StringBuilder();
-            foreach (var symbol in text.ToLower().Concat(new[] { '.' }))
+            foreach (var symbol in text.Concat(new[] { '.' }))
             {
                 if (char.IsLetterOrDigit(symbol))
                 {

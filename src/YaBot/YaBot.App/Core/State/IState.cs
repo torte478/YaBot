@@ -1,7 +1,5 @@
 ﻿namespace YaBot.App.Core.State
 {
-    using Outputs;
-    using YaBot.Core;
     using YaBot.Core.IO;
 
     public interface IState

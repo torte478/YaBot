@@ -4,6 +4,6 @@
 
     public interface IWords : IEnumerable<string>
     {
-        bool Match(string text);
+        bool Match(string text, bool substring = false);
     }
 }

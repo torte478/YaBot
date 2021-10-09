@@ -3,9 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Database;
-    using Extensions;
     using Outputs;
-    using YaBot.Core;
     using YaBot.Core.Extensions;
     using YaBot.Core.IO;
 

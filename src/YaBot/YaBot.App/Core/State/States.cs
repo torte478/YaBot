@@ -1,6 +1,8 @@
 ﻿namespace YaBot.App.Core.State
 {
     using System;
+    using System.Collections.Immutable;
+    using System.Linq;
     using System.Text;
     using Outputs;
     using YaBot.Core.Extensions;
@@ -8,11 +10,13 @@
 
     public sealed class States
     {
+        // TODO : refactor
         private readonly string version;
         private readonly IWords status;
         private readonly IState start;
+        private readonly ImmutableArray<IState> liners;
         private readonly IWords stoppers;
-        private readonly IWords auf;
+        private readonly IWords reset;
         private readonly IOutputFactory<string, IWords> outputs;
         private readonly Action<string> log;
 
@@ -33,9 +37,10 @@
 
         public States(
             string version,
-            IState start, 
+            IState start,
+            ImmutableArray<IState> liners,
             IWords stoppers, 
-            IWords auf, 
+            IWords reset,
             IWords status,
             IOutputFactory<string, IWords> outputs, 
             Action<string> log)
@@ -43,10 +48,11 @@
             this.version = version;
             this.start = start;
             this.stoppers = stoppers;
-            this.auf = auf;
+            this.reset = reset;
             this.status = status;
             this.outputs = outputs;
             this.log = log;
+            this.liners = liners;
 
             current = start;
             StartTime = DateTime.Now;
@@ -54,23 +60,29 @@
 
         public IOutput Process(IInput input)
         {
+            // TODO : status => IState
             if (status.Match(input.Text))
                 return GetStatus()._(outputs.Create);
             
-            var reset = Current != start && stoppers.Match(input.Text); 
-            if (reset)
+            var stop = Current != start && stoppers.Match(input.Text); 
+            if (stop)
             {
                 Current.Reset();
                 Current = start;
-                return auf._(outputs.Create);
+                return reset._(outputs.Create);
             }
+
+            var liner = liners.FirstOrDefault(_ => _.IsInput(input));
+
+            if (liner != null)
+                return liner.Process(input).Item1;
             
-            var (answer, next) =  Current.Process(input);
+            var (answer, next) = Current.Process(input);
 
             next ??= start;
-            
+
             Current = next;
-            
+
             return answer;
         }
 
