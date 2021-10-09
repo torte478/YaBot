@@ -123,6 +123,9 @@
                         places.Enumerate,
                         outputs
                         ),
+                    new WhoQuestionState(config["Question_Success"],
+                        config["WhoQuestion_Answers"],
+                        outputs),
                     new QuestionState(
                         config["Question_Success"],
                         outputs,
