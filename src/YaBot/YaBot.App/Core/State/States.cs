@@ -12,10 +12,11 @@
         // TODO : refactor
         private readonly IState start;
         private readonly ImmutableArray<IState> liners;
-        private readonly IWords stoppers;
-        private readonly IWords reset;
-        private readonly IOutputFactory<string, IWords> outputs;
+        private readonly ImmutableArray<IState> resets;
+        private readonly ImmutableArray<IState> stoppers;
         private readonly Action<string> log;
+
+        private bool stopped;
 
         private IState current;
         private IState Current
@@ -35,17 +36,15 @@
         public States(
             IState start,
             ImmutableArray<IState> liners,
-            IWords stoppers, 
-            IWords reset,
-            IOutputFactory<string, IWords> outputs,
+            ImmutableArray<IState> resets,
+            ImmutableArray<IState> stoppers,
             Action<string> log)
         {
             this.start = start;
-            this.stoppers = stoppers;
-            this.reset = reset;
-            this.outputs = outputs;
-            this.log = log;
             this.liners = liners;
+            this.resets = resets;
+            this.stoppers = stoppers;
+            this.log = log;
 
             current = start;
         }
@@ -55,16 +54,25 @@
 
         public IOutput Process(IInput input)
         {
-            var stop = Current != start && stoppers.Match(input.Text);
-            if (stop)
+            if (stopped)
+                return null;
+
+            var stop = stoppers.FirstOrDefault(_ => _.IsInput(input));
+            if (stop != null)
+            {
+                stopped = true;
+                return stop.Process(input).Item1;
+            }
+
+            var reset = resets.FirstOrDefault(_ => _.IsInput(input));
+            if (Current != start && reset != null)
             {
                 Current.Reset();
                 Current = start;
-                return reset._(outputs.Create);
+                return reset.Process(input).Item1;
             }
 
             var liner = liners.FirstOrDefault(_ => _.IsInput(input));
-
             if (liner != null)
                 return liner.Process(input).Item1;
             

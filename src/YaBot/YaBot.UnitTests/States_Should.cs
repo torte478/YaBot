@@ -18,28 +18,27 @@
         public void ChangeStateToStart_AfterReset()
         {
             var start = A.Fake<IState>();
-            var next = A.Fake<IState>();
-            var stoppers = A.Fake<IWords>();
-            var changeState = A.Fake<IInput>();
-            var reset = A.Fake<IInput>();
-            var outputs = new OutputFactory(_ => (_, Array.Empty<MessageEntity>())); //TODO: dependency
+            A.CallTo(() => start.Name).Returns("start");
+            A.CallTo(() => start.Process(A.Fake<IInput>()))
+                .Returns((A.Fake<IOutput>(), A.Fake<IState>()));
 
-            A.CallTo(() => stoppers.Match(reset.Text, false)).Returns(true);
-            A.CallTo(() => start.Process(A<IInput>._)).Returns(("start"._(outputs.Create), next));
-            A.CallTo(() => next.Process(A<IInput>._)).Returns(("next"._(outputs.Create), next));
+            var reset = A.Fake<IInput>();
+            var resetState = A.Fake<IState>();
+            A.CallTo(() => resetState.IsInput(reset)).Returns(true);
 
             var states = new States(
                 start,
                 ImmutableArray<IState>.Empty,
-                stoppers, 
-                A.Fake<IWords>(),
-                outputs,
+                new[] { resetState }.ToImmutableArray(),
+                ImmutableArray<IState>.Empty,
                 _ => { });
+            var changed = string.Empty;
+            states.StateChanged += _ => { changed = _; };
 
-            states.Process(changeState);
+            states.Process(A.Fake<IInput>());
             states.Process(reset);
-            
-            Assert.That(states.Process(A.Fake<IInput>()).Text, Is.EqualTo("start"));
+
+            Assert.That(changed, Is.EqualTo("start"));
         }
     }
 }

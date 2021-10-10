@@ -185,5 +185,11 @@
   ],
   "WhoQuestion_Answers": [
     "@Dmitry_Danilin"
+  ],
+  "Stop_Key": [
+    "mercusys"
+  ],
+  "Stop_Success": [
+    "Бот выключен"
   ]
 }

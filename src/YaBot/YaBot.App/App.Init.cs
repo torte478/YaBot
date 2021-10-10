@@ -145,25 +145,26 @@
                     config["Status"],
                     outputs,
                     Version);
-
                 var states = new States(
                     startState,
                     new IState[]
                         {
                             status,
                             new AufState(
-                                config["Auf_Auf_Key"],
-                                outputs,
-                                config["Auf_Auf_Success"]),
-                            new AufState(
-                                config["Auf_Work_Key"],
-                                outputs,
-                                config["Auf_Work_Success"])
+                                config["Auf_Auf_Key"], outputs, config["Auf_Auf_Success"]),
+                            new AufState(config["Auf_Work_Key"], outputs, config["Auf_Work_Success"])
                         }
                         .ToImmutableArray(),
-                    config["Reset"],
-                    config["Auf"],
-                    outputs,
+                    new IState[]
+                        {
+                            new AufState(config["Reset"], outputs, config["Auf"])
+                        }
+                        .ToImmutableArray(),
+                    new IState[]
+                        {
+                            new AufState(config["Stop_Key"], outputs, config["Stop_Success"])
+                        }
+                        .ToImmutableArray(),
                     log);
 
                 states.StateChanged += status.Update;
