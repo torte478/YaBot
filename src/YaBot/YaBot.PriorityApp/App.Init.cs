@@ -52,6 +52,7 @@
                         ).Serialize)
                     .CreateAsync,
                 bot.Receive,
+                _ => new JsonUpdate(_).ToString(),
                 Log);
 
             return new App(

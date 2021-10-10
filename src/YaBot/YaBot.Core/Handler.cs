@@ -4,7 +4,6 @@
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-    using Newtonsoft.Json;
     using Telegram.Bot;
     using Telegram.Bot.Extensions.Polling;
     using Telegram.Bot.Types;
@@ -18,6 +17,7 @@
         private readonly Func<ITelegramBotClient, Update, CancellationToken, Task<IInput>> toInputAsync;
         private readonly Func<IInput, IOutput> receive;
         private readonly Action<string> log;
+        private readonly Func<Update, string> serialize;
 
 #pragma warning disable 8632
         // ReSharper disable once UnusedMember.Global
@@ -28,10 +28,12 @@
         public Handler(
             Func<ITelegramBotClient, Update, CancellationToken, Task<IInput>> toInputAsync, 
             Func<IInput, IOutput> receive, 
+            Func<Update, string> serialize,
             Action<string> log)
         {
             this.receive = receive;
             this.log = log;
+            this.serialize = serialize;
             this.toInputAsync = toInputAsync;
         }
 
@@ -56,7 +58,7 @@
             catch (Exception ex)
             {
                 log(ex.ToString());
-                log(update._(JsonConvert.SerializeObject));
+                log(update._(serialize));
                 throw;
             }
         }

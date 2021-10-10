@@ -1,14 +1,9 @@
 ﻿namespace YaBot.Tests
 {
-    using System;
     using System.Collections.Immutable;
-    using App.Core;
     using App.Core.State;
-    using App.TelegramApi;
     using FakeItEasy;
     using NUnit.Framework;
-    using Telegram.Bot.Types;
-    using YaBot.Core.Extensions;
     using YaBot.Core.IO;
 
     [TestFixture]

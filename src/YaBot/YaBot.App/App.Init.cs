@@ -179,6 +179,7 @@
             var handler = new Handler(
                 new InputFactory(formattedText.Serialize).CreateAsync,
                 bot.Receive,
+                _ => new JsonUpdate(_).ToString(),
                 log);
 
             return new App(

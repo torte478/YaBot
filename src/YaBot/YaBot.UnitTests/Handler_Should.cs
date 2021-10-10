@@ -70,7 +70,7 @@
             var actual = string.Empty;
             Action<string> log = _ =>
             {
-                actual = _;
+                actual += _;
             };
 
             var instance = Create(
@@ -112,7 +112,7 @@
             Func<IInput, IOutput> receive,
             Action<string> log)
         {
-            return new Handler(toInputAsync, receive, log);
+            return new Handler(toInputAsync, receive, _ => string.Empty, log);
         }
 
         private class FakeReceiver
