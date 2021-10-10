@@ -3,13 +3,11 @@
     using System;
     using System.Collections.Immutable;
     using System.Linq;
-    using Outputs;
     using YaBot.Core.Extensions;
     using YaBot.Core.IO;
 
     public sealed class States
     {
-        // TODO : refactor
         private readonly IState start;
         private readonly ImmutableArray<IState> liners;
         private readonly ImmutableArray<IState> resets;
@@ -27,7 +25,7 @@
                 if (current != value)
                 {
                     log($"{current.Name} => {value.Name}");
-                    StateChanged.Raise(value.Name);
+                    Changed.Raise(value.Name);
                 }
                 current = value;
             }
@@ -49,8 +47,7 @@
             current = start;
         }
 
-        // TODO : rename
-        public event Action<string> StateChanged;
+        public event Action<string> Changed;
 
         public IOutput Process(IInput input)
         {

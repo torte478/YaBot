@@ -48,7 +48,7 @@
             var handler = new Handler(
                 new InputFactory(
                     new FormattedText(
-                        ImmutableDictionary<MessageEntityType, IToken>.Empty
+                        ImmutableArray<IToken>.Empty
                         ).Serialize)
                     .CreateAsync,
                 bot.Receive,

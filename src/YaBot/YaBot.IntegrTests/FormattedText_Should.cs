@@ -1,7 +1,6 @@
 ﻿namespace YaBot.IntegrTests
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
     using NUnit.Framework;
@@ -17,12 +16,12 @@
         [SetUp]
         public void SetUp()
         {
-            formattedText = new FormattedText(new Dictionary<MessageEntityType, IToken>
+            formattedText = new FormattedText(new IToken[]
                 {
-                    { MessageEntityType.Bold, new BoldToken("**") },
-                    { MessageEntityType.TextLink, new TextLinkToken("^^", "|") }
+                    new Token(MessageEntityType.Bold, "**"),
+                    new LinkToken(MessageEntityType.TextLink, "^^", "|")
                 }
-                .ToImmutableDictionary());
+                .ToImmutableArray());
         }
 
         [Test]

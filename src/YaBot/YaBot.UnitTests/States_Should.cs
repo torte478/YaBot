@@ -28,7 +28,7 @@
                 ImmutableArray<IState>.Empty,
                 _ => { });
             var changed = string.Empty;
-            states.StateChanged += _ => { changed = _; };
+            states.Changed += _ => { changed = _; };
 
             states.Process(A.Fake<IInput>());
             states.Process(reset);

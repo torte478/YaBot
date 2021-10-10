@@ -5,14 +5,13 @@
     using System.Linq;
     using System.Text;
     using Telegram.Bot.Types;
-    using Telegram.Bot.Types.Enums;
     using YaBot.Core.Extensions;
 
     public sealed class FormattedText
     {
-        private readonly IImmutableDictionary<MessageEntityType, IToken> formats;
+        private readonly ImmutableArray<IToken> formats;
 
-        public FormattedText(IImmutableDictionary<MessageEntityType, IToken> formats)
+        public FormattedText(ImmutableArray<IToken> formats)
         {
             this.formats = formats;
         }
@@ -27,7 +26,7 @@
                 return message.Text;
 
             var entities = message.Entities
-                .Where(_ => _.Type._(formats.ContainsKey))
+                .Where(_ => formats.Any(f => f.Type == _.Type))
                 .OrderBy(_ => _.Offset)
                 ._(_ => new Queue<MessageEntity>(_));
 
@@ -37,10 +36,11 @@
                 if (entities.TryPeek(out var entity) && entity.Offset == i)
                 {
                     var end = entity.Offset + entity.Length - 1;
+                    var format = formats.Single(_ => _.Type == entity.Type);
 
                     message.Text
                         .Substring(entity.Offset, entity.Length)
-                        ._(_ => formats[entity.Type].Serialize(entity, _))
+                        ._(_ => format.Serialize(entity, _))
                         ._(result.Append);
 
                     entities.Dequeue();
@@ -58,7 +58,7 @@
         public (string, MessageEntity[]) Deserialize(string text)
         {
             (string token, MessageEntity entity) seed = (token: text, null);
-            var tokens =  formats.Values
+            var tokens =  formats
                 .Aggregate(
                     new[] { seed }.AsEnumerable(),
                     Deserialize);

@@ -51,14 +51,13 @@
 
             var error = config["Error"];
 
-            var formattedText = new FormattedText(new Dictionary<MessageEntityType, IToken>
+            var formattedText = new FormattedText(new IToken[]
                 {
-                    // TODO : concat key and impl
-                    { MessageEntityType.Bold, new BoldToken("**") },
-                    { MessageEntityType.Italic, new ItalicToken("~~") },
-                    { MessageEntityType.TextLink, new TextLinkToken("^^", "|") }
+                    new Token(MessageEntityType.Bold, "**"),
+                    new Token(MessageEntityType.Italic, "~~"),
+                    new LinkToken(MessageEntityType.TextLink, "^^", "|")
                 }
-                .ToImmutableDictionary());
+                .ToImmutableArray());
             var outputs = new OutputFactory(formattedText.Deserialize);
             var random = new Random(DateTime.Now.Millisecond);
 
@@ -167,7 +166,7 @@
                         .ToImmutableArray(),
                     log);
 
-                states.StateChanged += status.Update;
+                states.Changed += status.Update;
                 return states;
             }
 
