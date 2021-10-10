@@ -139,26 +139,36 @@
                 .ToImmutableArray(),
                 outputs.Create);
 
-            States CreateStates() => new States(
-                Version,
-                startState, 
-                new IState[]
-                {
-                    new AufState(
-                        config["Auf_Auf_Key"],
-                        config["Auf_Auf_Success"],
-                        outputs),
-                    new AufState(
-                        config["Auf_Work_Key"],
-                        config["Auf_Work_Success"],
-                        outputs)
-                }
-                    .ToImmutableArray(),
-                config["Reset"],
-                config["Auf"],
-                config["Status"],
-                outputs,
-                log);
+            States CreateStates()
+            {
+                var status = new StatusState(
+                    config["Status"],
+                    outputs,
+                    Version);
+
+                var states = new States(
+                    startState,
+                    new IState[]
+                        {
+                            status,
+                            new AufState(
+                                config["Auf_Auf_Key"],
+                                outputs,
+                                config["Auf_Auf_Success"]),
+                            new AufState(
+                                config["Auf_Work_Key"],
+                                outputs,
+                                config["Auf_Work_Success"])
+                        }
+                        .ToImmutableArray(),
+                    config["Reset"],
+                    config["Auf"],
+                    outputs,
+                    log);
+
+                states.StateChanged += status.Update;
+                return states;
+            }
 
             var bot = new Bot(createReceiver: 
                 () => CreateStates().Process,

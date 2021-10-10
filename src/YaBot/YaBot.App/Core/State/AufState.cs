@@ -2,37 +2,23 @@
 {
     using YaBot.App.Core.Outputs;
     using YaBot.App.Extensions;
-    using YaBot.Core.Extensions;
     using YaBot.Core.IO;
 
-    public sealed class AufState : IState
+    public sealed class AufState : BaseState
     {
-        private readonly IWords keys;
         private readonly IWords response;
-        private readonly IOutputFactory<string> output;
 
-        public AufState(IWords keys, IWords response, IOutputFactory<string> output)
+        public AufState(IWords keys, IOutputFactory<string> output, IWords response)
+            : base(keys, output)
         {
-            this.keys = keys;
             this.response = response;
-            this.output = output;
         }
 
-        public string Name => "Auf";
+        public override string Name => "Auf";
 
-        public bool IsInput(IInput input)
+        protected override string InnerProcess(IInput input)
         {
-            return keys.Match(input.Text, true);
-        }
-
-        public (IOutput, IState) Process(IInput input)
-        {
-            return (response.ToRandom()._(output.Create), null);
-        }
-
-        public IState Reset()
-        {
-            return this;
+            return response.ToRandom();
         }
     }
 }

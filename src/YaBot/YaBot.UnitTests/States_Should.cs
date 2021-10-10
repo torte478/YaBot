@@ -29,11 +29,9 @@
             A.CallTo(() => next.Process(A<IInput>._)).Returns(("next"._(outputs.Create), next));
 
             var states = new States(
-                string.Empty,
                 start,
                 ImmutableArray<IState>.Empty,
                 stoppers, 
-                A.Fake<IWords>(),
                 A.Fake<IWords>(),
                 outputs,
                 _ => { });
