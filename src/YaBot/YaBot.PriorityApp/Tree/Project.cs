@@ -37,7 +37,7 @@
 
         public IEnumerable<(int id, string text)> ToPriorityList()
         {
-            return storage.Enumerate() // TODO : optimize list
+            return storage.Enumerate()
                 .Where(_ => _.Project == project)
                 .OrderByDescending(_ => _.Value)
                 .Select(_ => (_.Id, _.Text));

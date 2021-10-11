@@ -21,35 +21,32 @@
 
     internal partial class App
     {
-        // TODO : to config
-        private const string Version = "1.0.0";
-        private const int Pagination = 20;
-        
-        private const string ConfigPath = "config.json";
-        private const string CredentialsPath = "credentials.json";
+        private const string Settings = "config.json";
 
         public static App Init(Action<string> log)
         {
-            var credentials = CredentialsPath
-                ._(File.ReadAllText)
+            var config = JsonConfig.Create(Settings);
+
+            var credentials = config["credentials"].GetString()
+                ?._(File.ReadAllText)
                 ._(JsonConvert.DeserializeObject<Credentials>)
                 ?? 
                 throw new Exception("Credentials is null");
 
-            var config = ConfigPath
+            var keys = config["keys"].ToString()
                 ._(File.ReadAllText)
                 ._(JsonConvert.DeserializeObject<Dictionary<string, string[]>>)
                 ?.ToDictionary(
                     _ => _.Key,
                     _ => _.Value._(Words.Create))
-                ?? 
-                throw new Exception("Config is null"); 
-            
+                ??
+                throw new Exception("Config is null");
+
             var context = new Context(credentials.Database);
-            
+
             var places = new Crudl<Context, Place>(context, _ => _.Places);
 
-            var error = config["Error"];
+            var error = keys["Error"];
 
             var formattedText = new FormattedText(new IToken[]
                 {
@@ -68,16 +65,15 @@
                     _ => _.Nouns),
                 new RandomCrudlCache<int, Noun>.Args
                 {
-                    // TODO : to config
-                    Min = 1,
-                    Max = 2,
-                    Count = 2,
-                    Limit = 1000
+                    Min = config["nounCacheMinIndex"].GetInt32(),
+                    Max = config["nounCacheMaxIndex"].GetInt32(),
+                    Count = config["nounCacheCount"].GetInt32(),
+                    Limit = config["nounCacheLimit"].GetInt32()
                 });
 
             var startState = new StartState(
-                config["Names"],
-                config["Ping"],
+                keys["Names"],
+                keys["Ping"],
                 new IState[]
                 {
                     new PlaceCrudlState(
@@ -85,53 +81,53 @@
                         {
                             Create = new PlaceCrudlState.StateKeys
                             {
-                                Keys = config["PlaceCrudlState_Create_Keys"],
-                                Start = config["PlaceCrudlState_Create_Start"],
-                                Success = config["PlaceCrudlState_Create_Success"]
+                                Keys = keys["PlaceCrudlState_Create_Keys"],
+                                Start = keys["PlaceCrudlState_Create_Start"],
+                                Success = keys["PlaceCrudlState_Create_Success"]
                             },
                             Read = new PlaceCrudlState.StateKeys
                             {
-                                Keys = config["PlaceCrudlState_Read_Keys"],
-                                Start = config["PlaceCrudlState_Read_Start"]
+                                Keys = keys["PlaceCrudlState_Read_Keys"],
+                                Start = keys["PlaceCrudlState_Read_Start"]
                             },
                             Delete = new PlaceCrudlState.StateKeys
                             {
-                                Keys = config["PlaceCrudlState_Delete_Keys"],
-                                Start = config["PlaceCrudlState_Delete_Start"],
-                                Success = config["PlaceCrudlState_Delete_Success"]
+                                Keys = keys["PlaceCrudlState_Delete_Keys"],
+                                Start = keys["PlaceCrudlState_Delete_Start"],
+                                Success = keys["PlaceCrudlState_Delete_Success"]
                             },
                             List =  new PlaceCrudlState.StateKeys
                             {
-                                Keys = config["PlaceCrudlState_List_Keys"],
-                                Success = config["PlaceCrudlState_List_Success"],
-                                Next = config["PlaceCrudlState_List_Next"],
-                                Previous = config["PlaceCrudlState_List_Previous"]
+                                Keys = keys["PlaceCrudlState_List_Keys"],
+                                Success = keys["PlaceCrudlState_List_Success"],
+                                Next = keys["PlaceCrudlState_List_Next"],
+                                Previous = keys["PlaceCrudlState_List_Previous"]
                             },
                             Error = error
                         },
                         places,
                         outputs,
-                        new Page(Pagination).Create,
+                        new Page(config["pagination"].GetInt32()).Create,
                         new Title(
-                            50, //TODO : to config
+                            config["titleLength"].GetInt32(),
                             _ => formattedText.Deserialize(_).Item1)
                             .Create),
                     new GetRandomPlaceState(
-                        config["GetRandomPlace_Keys"],
-                        config["GetRandomPlace_Next"],
+                        keys["GetRandomPlace_Keys"],
+                        keys["GetRandomPlace_Next"],
                         places.Enumerate,
                         outputs
                         ),
                     new OrQuestionState(
-                        config["Question_Success"],
+                        keys["Question_Success"],
                         outputs,
                         () => random.Next(2)),
                     new WhoQuestionState(
-                        config["Question_Success"],
-                        config["WhoQuestion_Answers"],
+                        keys["Question_Success"],
+                        keys["WhoQuestion_Answers"],
                         outputs),
                     new QuestionState(
-                        config["Question_Success"],
+                        keys["Question_Success"],
                         outputs,
                         () => nounCache.Next().Text)
                 }
@@ -141,27 +137,27 @@
             States CreateStates()
             {
                 var status = new StatusState(
-                    config["Status"],
+                    keys["Status"],
                     outputs,
-                    Version);
+                    config["version"].GetString());
                 var states = new States(
                     startState,
                     new IState[]
                         {
                             status,
                             new AufState(
-                                config["Auf_Auf_Key"], outputs, config["Auf_Auf_Success"]),
-                            new AufState(config["Auf_Work_Key"], outputs, config["Auf_Work_Success"])
+                                keys["Auf_Auf_Key"], outputs, keys["Auf_Auf_Success"]),
+                            new AufState(keys["Auf_Work_Key"], outputs, keys["Auf_Work_Success"])
                         }
                         .ToImmutableArray(),
                     new IState[]
                         {
-                            new AufState(config["Reset"], outputs, config["Auf"])
+                            new AufState(keys["Reset"], outputs, keys["Auf"])
                         }
                         .ToImmutableArray(),
                     new IState[]
                         {
-                            new AufState(config["Stop_Key"], outputs, config["Stop_Success"])
+                            new AufState(keys["Stop_Key"], outputs, keys["Stop_Success"])
                         }
                         .ToImmutableArray(),
                     log);

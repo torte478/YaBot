@@ -4,11 +4,13 @@
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
-    using System.Text;
+    using System.Text.RegularExpressions;
     using YaBot.Core.Extensions;
 
     public sealed class Words : IWords
     {
+        private static readonly Regex Regex = new Regex(@"(\w+)");
+
         private readonly ImmutableHashSet<string> keys;
 
         public static IWords Create(IEnumerable<string> words)
@@ -29,7 +31,7 @@
             var lower = text.ToLower();
             return substring
                 ? keys.Any(lower.Contains)
-                : lower._(Parse).Any(keys.Contains);
+                : lower._(Regex.Split).Any(keys.Contains);
         }
         
         public IEnumerator<string> GetEnumerator()
@@ -40,26 +42,6 @@
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-
-        private static IEnumerable<string> Parse(string text)
-        {
-            // TODO : refactor
-            var result = new StringBuilder();
-            foreach (var symbol in text.Concat(new[] { '.' }))
-            {
-                if (char.IsLetterOrDigit(symbol))
-                {
-                    result.Append(symbol);
-                }
-                else
-                {
-                    if (result.Length > 0)
-                        yield return result.ToString();
-
-                    result.Clear();
-                }
-            }
         }
     }
 }
