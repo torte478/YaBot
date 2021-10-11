@@ -18,41 +18,12 @@
 
         public string Serialize(Message message)
         {
-            //TODO : to cool swtich
-            if (message?.Text?._(string.IsNullOrEmpty) ?? true)
-                return null;
-
-            if (message.Entities == null)
-                return message.Text;
-
-            var entities = message.Entities
-                .Where(_ => formats.Any(f => f.Type == _.Type))
-                .OrderBy(_ => _.Offset)
-                ._(_ => new Queue<MessageEntity>(_));
-
-            var result = new StringBuilder();
-            for (var i = 0; i < message.Text.Length; ++i)
+            return message switch
             {
-                if (entities.TryPeek(out var entity) && entity.Offset == i)
-                {
-                    var end = entity.Offset + entity.Length - 1;
-                    var format = formats.Single(_ => _.Type == entity.Type);
-
-                    message.Text
-                        .Substring(entity.Offset, entity.Length)
-                        ._(_ => format.Serialize(entity, _))
-                        ._(result.Append);
-
-                    entities.Dequeue();
-                    i = end;
-                }
-                else
-                {
-                    result.Append(message.Text[i]);
-                }
-            }
-
-            return result.ToString();
+                null or {Text: null} or {Text: ""} => null,
+                {Entities: null} => message.Text,
+                _ => InnerSerialize(message)
+            };
         }
 
         public (string, MessageEntity[]) Deserialize(string text)
@@ -80,7 +51,39 @@
             return (result.ToString(), entities.ToArray());
         }
 
-        private IEnumerable<(string, MessageEntity)> Deserialize(
+        private string InnerSerialize(Message message)
+        {
+            var entities = message.Entities
+                !.Where(_ => formats.Any(f => f.Type == _.Type))
+                .OrderBy(_ => _.Offset)
+                ._(_ => new Queue<MessageEntity>(_));
+
+            var result = new StringBuilder();
+            for (var i = 0; i < message.Text!.Length; ++i)
+            {
+                if (entities.TryPeek(out var entity) && entity.Offset == i)
+                {
+                    var end = entity.Offset + entity.Length - 1;
+                    var format = formats.Single(_ => _.Type == entity.Type);
+
+                    message.Text
+                        .Substring(entity.Offset, entity.Length)
+                        ._(_ => format.Serialize(entity, _))
+                        ._(result.Append);
+
+                    entities.Dequeue();
+                    i = end;
+                }
+                else
+                {
+                    result.Append(message.Text[i]);
+                }
+            }
+
+            return result.ToString();
+        }
+
+        private static IEnumerable<(string, MessageEntity)> Deserialize(
             IEnumerable<(string token, MessageEntity entity)> acc,
             IToken format)
         {
