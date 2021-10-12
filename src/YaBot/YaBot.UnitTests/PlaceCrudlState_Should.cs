@@ -169,7 +169,7 @@
             return new(
                 keys,
                 places,
-                new OutputFactory(_ => (_, Array.Empty<MessageEntity>())), // TODO : dependency
+                new FakeOutputFactory(),
                 (items, _) => new Pagination<string>
                 {
                     Start = 1,

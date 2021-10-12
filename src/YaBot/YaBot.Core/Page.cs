@@ -15,6 +15,14 @@
 
         public Pagination<T> Create<T>(IEnumerable<T> items, int page)
         {
+            var i = 0;
+            foreach (var item in items)
+            {
+                ++i;
+            }
+
+
+
             // TODO : optimize
             var total = items.Count();
             if (total == 0)

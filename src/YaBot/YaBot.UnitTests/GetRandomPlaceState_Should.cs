@@ -9,7 +9,6 @@
     using App.TelegramApi;
     using FakeItEasy;
     using NUnit.Framework;
-    using Telegram.Bot.Types;
     using YaBot.Core.Extensions;
     using YaBot.Core.IO;
 
@@ -84,7 +83,7 @@
                 keys,
                 words,
                 getPlaces,
-                new OutputFactory(_ => (_, Array.Empty<MessageEntity>()))); //TODO : dependency
+                new FakeOutputFactory());
         }
     }
 }
