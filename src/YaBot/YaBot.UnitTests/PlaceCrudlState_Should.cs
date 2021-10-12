@@ -20,13 +20,12 @@
         {
             var state = CreateForListTest();
 
-            // TODO : check first content, not count
-            var count = state
+            var title = state
                 ._(GetTextOutput, A.Fake<IInput>())
                 .Split(Environment.NewLine)
-                .Length;
-            
-            Assert.That(count, Is.EqualTo(3));
+                .First();
+
+            Assert.That(title.Contains("2..3 из 3"), Is.True);
         }
 
         [Test]

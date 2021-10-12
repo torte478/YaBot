@@ -11,14 +11,13 @@
 
         private readonly DateTime start;
 
-        private string state;
+        private string state = "?";
 
         public StatusState(IWords keys, IOutputFactory<string> output, string version) : base(keys, output)
         {
             this.version = version;
 
             start = DateTime.Now;
-            state = "Start"; //TODO : actual
         }
 
         public override string Name => "Status";

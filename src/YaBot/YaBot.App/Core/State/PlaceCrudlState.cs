@@ -1,6 +1,7 @@
 ﻿namespace YaBot.App.Core.State
 {
     using System;
+    using System.Collections.Immutable;
     using System.Linq;
     using System.Text;
     using Database;
@@ -20,12 +21,14 @@
         private readonly Func<IQueryable<string>, int, Pagination<string>> paginate;
         private readonly Func<string, string> getTitle;
 
-        private State state;
+        private readonly ImmutableArray<(IWords, State)> matches;
+
+        private State current;
 
         private int page;
         
         public string Name => "PlaceCrudl";
-        
+
         public PlaceCrudlState(
             Keys keys, 
             ICrudl<int, Place> places, 
@@ -39,25 +42,27 @@
             this.paginate = paginate;
             this.getTitle = getTitle;
 
-            state = State.Start;
+            matches = FillMatches();
+
+            current = State.Start;
         }
 
         public bool IsInput(IInput input)
         {
-            return state != State.Start
+            return current != State.Start
                    || Match(input.Text) != State.Unknown;
         }
 
         public IState Reset()
         {
             page = 0;
-            state = State.Start;
+            current = State.Start;
             return this;
         }
 
         public (IOutput, IState) Process(IInput input)
         {
-            return state switch
+            return current switch
             {
                 State.Start => ProcessInnerState(input),
                 State.Create => RunCreate(input),
@@ -144,7 +149,7 @@
 
         private (IOutput, IState) StartOperation(StateKeys key, State next)
         {
-            state = next;
+            current = next;
             return (key.Start._(outputs.Create), this);
         }
 
@@ -187,26 +192,28 @@
             return place;
         }
 
+        private ImmutableArray<(IWords, State)> FillMatches()
+        {
+            return new[]
+            {
+                (keys.Create?.Keys, State.Create),
+                (keys.Read?.Keys, State.Read),
+                (keys.Delete?.Keys, State.Delete),
+                (keys.List?.Keys, State.List),
+                (keys.List?.Next, State.Next),
+                (keys.List?.Previous, State.Previous),
+            }
+                .Where(x => x.Item1 != null)
+                .ToImmutableArray();
+        }
+
         private State Match(string message)
         {
-            //TODO : shit
-            if (keys.Create?.Keys.Match(message) ?? false)
-                return State.Create;
-
-            if (keys.Read?.Keys.Match(message) ?? false)
-                return State.Read;
-                
-            if (keys.Delete?.Keys.Match(message) ?? false)
-                return State.Delete;
-                
-            if (keys.List?.Keys.Match(message) ?? false)
-                return State.List;
-
-            if (keys.List?.Next.Match(message) ?? false)
-                return State.Next;
-
-            if (keys.List?.Previous.Match(message) ?? false)
-                return State.Previous;
+            foreach (var (key, state) in matches)
+            {
+                if (key.Match(message))
+                    return state;
+            }
 
             return State.Unknown;
         }
@@ -215,7 +222,7 @@
         {
             return new StringBuilder()
                 .AppendLine(base.ToString())
-                .AppendLine(state.ToString())
+                .AppendLine(current.ToString())
                 .ToString();
         }
 

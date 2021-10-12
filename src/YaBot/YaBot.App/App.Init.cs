@@ -163,6 +163,8 @@
                     log);
 
                 states.Changed += status.Update;
+                status.Update(startState.Name);
+
                 return states;
             }
 
