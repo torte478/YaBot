@@ -4,9 +4,9 @@ namespace YaBot.PriorityApp
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using YaBot.Core;
-    using YaBot.Core.Extensions;
-    using YaBot.Core.IO;
+    using YaBot;
+    using YaBot.Extensions;
+    using YaBot.IO;
     using YaBot.PriorityApp.Database;
     using YaBot.PriorityApp.Tree;
     using Project = YaBot.PriorityApp.Database.Project;

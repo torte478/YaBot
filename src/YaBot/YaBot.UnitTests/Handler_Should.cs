@@ -7,8 +7,8 @@
     using NUnit.Framework;
     using Telegram.Bot;
     using Telegram.Bot.Types;
-    using YaBot.Core;
-    using YaBot.Core.IO;
+    using YaBot;
+    using YaBot.IO;
     using static System.Threading.Tasks.Task;
 
     [TestFixture]
@@ -77,7 +77,9 @@
                 (_, _, _) => Run(() =>
                 {
                     throw new Exception("EXPECTED");
+#pragma warning disable 162
                     return A.Fake<IInput>();
+#pragma warning restore 162
                 }),
                 _ => null,
                 log);

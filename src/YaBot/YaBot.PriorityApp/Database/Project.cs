@@ -3,8 +3,8 @@
 namespace YaBot.PriorityApp.Database
 {
     using System.Collections.Generic;
-    using YaBot.Core;
-    using YaBot.Core.Database;
+    using YaBot;
+    using YaBot.Database;
 
     public partial class Project : IHasId<int>
     {

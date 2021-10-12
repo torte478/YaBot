@@ -1,7 +1,6 @@
 ﻿namespace YaBot.App.Core.State
 {
-    using YaBot.App.Core.Outputs;
-    using YaBot.Core.IO;
+    using YaBot.IO;
 
     public abstract class BaseState : IState
     {

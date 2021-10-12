@@ -2,7 +2,7 @@
 {
     using NUnit.Framework;
     using Telegram.Bot.Types;
-    using YaBot.Core.IO;
+    using YaBot.IO;
 
     [TestFixture]
     internal sealed class JsonUpdate_Should

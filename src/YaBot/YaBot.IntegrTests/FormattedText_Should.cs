@@ -6,7 +6,7 @@
     using NUnit.Framework;
     using Telegram.Bot.Types;
     using Telegram.Bot.Types.Enums;
-    using YaBot.Core.IO.Format;
+    using YaBot.IO.Format;
 
     [TestFixture]
     internal sealed class FormattedText_Should

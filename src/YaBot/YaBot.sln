@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YaBot.App", "YaBot.App\YaBo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YaBot.UnitTests", "YaBot.UnitTests\YaBot.UnitTests.csproj", "{92DBB633-390E-4869-AA0F-73B1B2261D1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YaBot.Core", "YaBot.Core\YaBot.Core.csproj", "{B25DE16B-7533-41EC-A264-DAABB5B9496E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YaBot", "YaBot\YaBot.csproj", "{B25DE16B-7533-41EC-A264-DAABB5B9496E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YaBot.PriorityApp", "YaBot.PriorityApp\YaBot.PriorityApp.csproj", "{BCAB1786-4172-4FF8-B0A9-AF758F603FFC}"
 EndProject

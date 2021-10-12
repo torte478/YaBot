@@ -4,7 +4,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Telegram.Bot;
-    using YaBot.Core.Extensions;
+    using YaBot.Extensions;
     using YaBot.PriorityApp.Database;
 
     internal sealed partial class App : IDisposable

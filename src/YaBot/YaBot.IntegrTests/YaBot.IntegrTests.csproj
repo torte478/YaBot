@@ -15,7 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\YaBot.App\YaBot.App.csproj" />
-      <ProjectReference Include="..\YaBot.Core\YaBot.Core.csproj" />
+      <ProjectReference Include="..\YaBot\YaBot.csproj" />
     </ItemGroup>
 
 </Project>

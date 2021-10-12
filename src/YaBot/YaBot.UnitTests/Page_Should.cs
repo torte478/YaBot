@@ -2,7 +2,7 @@
 {
     using System.Linq;
     using NUnit.Framework;
-    using YaBot.Core;
+    using YaBot;
 
     [TestFixture]
     internal sealed class Page_Should

@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Immutable;
     using System.Linq;
-    using YaBot.Core.Extensions;
-    using YaBot.Core.IO;
+    using YaBot.Extensions;
+    using YaBot.IO;
 
     public sealed class States
     {

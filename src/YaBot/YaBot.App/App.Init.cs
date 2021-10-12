@@ -11,12 +11,12 @@
     using Newtonsoft.Json;
     using Telegram.Bot;
     using Telegram.Bot.Types.Enums;
-    using TelegramApi;
-    using YaBot.Core;
-    using YaBot.Core.Database;
-    using YaBot.Core.Extensions;
-    using YaBot.Core.IO;
-    using YaBot.Core.IO.Format;
+    using YaBot.App.Core.State.Impl;
+    using YaBot;
+    using YaBot.Database;
+    using YaBot.Extensions;
+    using YaBot.IO;
+    using YaBot.IO.Format;
     using File = System.IO.File;
 
     internal partial class App

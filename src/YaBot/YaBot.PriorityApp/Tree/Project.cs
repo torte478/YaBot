@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using YaBot.Core;
+    using YaBot;
     using YaBot.PriorityApp.Database;
 
     public sealed class Project : IProject, IDisposable

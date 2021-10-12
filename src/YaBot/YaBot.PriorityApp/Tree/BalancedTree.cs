@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using YaBot.Core.Extensions;
+    using YaBot.Extensions;
     using YaBot.PriorityApp.Tree.RBT;
 
     public sealed partial class BalancedTree<T> : IBalancedTree<T>

@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\YaBot.Core\YaBot.Core.csproj" />
+      <ProjectReference Include="..\YaBot\YaBot.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -2,7 +2,7 @@
 {
     using System;
     using NUnit.Framework;
-    using YaBot.Core.IO;
+    using YaBot.IO;
 
     [TestFixture]
     internal sealed class Output_Should

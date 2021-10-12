@@ -1,7 +1,7 @@
 ﻿namespace YaBot.App.Core.Database
 {
-    using YaBot.Core;
-    using YaBot.Core.Database;
+    using YaBot;
+    using YaBot.Database;
 
     public partial class Noun : IHasId<int>
     {

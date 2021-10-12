@@ -5,7 +5,7 @@
     using System.Collections.Immutable;
     using System.Linq;
     using System.Text.RegularExpressions;
-    using YaBot.Core.Extensions;
+    using YaBot.Extensions;
 
     public sealed class Words : IWords
     {

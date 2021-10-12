@@ -6,7 +6,7 @@
     using Core.Database;
     using Extensions;
     using Telegram.Bot;
-    using YaBot.Core.Extensions;
+    using YaBot.Extensions;
 
     internal sealed partial class App : IDisposable
     {

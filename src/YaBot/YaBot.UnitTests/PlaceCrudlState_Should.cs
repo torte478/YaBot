@@ -3,14 +3,16 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using App.Core;
-    using App.Core.Database;
-    using App.Core.State;
     using FakeItEasy;
     using NUnit.Framework;
-    using YaBot.Core;
-    using YaBot.Core.Extensions;
-    using YaBot.Core.IO;
+    using YaBot.App.Core.State.Impl;
+    using YaBot;
+    using YaBot.App.Core;
+    using YaBot.App.Core.Database;
+    using YaBot.App.Core.State;
+    using YaBot.Extensions;
+    using YaBot.IO;
+    using YaBot.Tests.Fake;
 
     [TestFixture]
     internal sealed class PlaceCrudlState_Should
