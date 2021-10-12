@@ -170,7 +170,7 @@ namespace YaBot.PriorityApp
             if (current == null)
             {
                 return projects
-                    .Enumerate()
+                    .All()
                     .Select(_ => $"{_.Id}: {_.Name}")
                     ._(ConcatToString);    
             }

@@ -1,7 +1,6 @@
 ﻿namespace YaBot.Core
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
 
     public sealed class Page
@@ -13,17 +12,8 @@
             this.size = size;
         }
 
-        public Pagination<T> Create<T>(IEnumerable<T> items, int page)
+        public Pagination<T> Create<T>(IQueryable<T> items, int page)
         {
-            var i = 0;
-            foreach (var item in items)
-            {
-                ++i;
-            }
-
-
-
-            // TODO : optimize
             var total = items.Count();
             if (total == 0)
                 return new Pagination<T> { Items = Enumerable.Empty<(int, T)>() };
@@ -39,6 +29,7 @@
                 Items = items
                     .Skip(start)
                     .Take(size)
+                    .AsEnumerable()
                     .Select((x, i) => (start + i, x)),
                 Start = start,
                 Finish = finish,

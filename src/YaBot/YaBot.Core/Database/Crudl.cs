@@ -1,7 +1,6 @@
 ﻿namespace YaBot.Core.Database
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using Microsoft.EntityFrameworkCore;
     using YaBot.Core.Extensions;
@@ -63,7 +62,7 @@
             return item != null;
         }
 
-        public IEnumerable<TEntity> Enumerate()
+        public IQueryable<TEntity> All()
         {
             return context._(getEntities);
         }

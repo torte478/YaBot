@@ -24,7 +24,7 @@
         public static IProject Create(int project, ICrudl<int, Objective> storage, Func<IBalancedTree<int>> createTree)
         {
             var tree = createTree();
-            foreach (var item in storage.Enumerate().Where(_ => _.Project == project))
+            foreach (var item in storage.All().Where(_ => _.Project == project))
                 tree.Add(item.Id, item.Value);
         
             return new Project(project, tree, storage);
@@ -37,9 +37,10 @@
 
         public IEnumerable<(int id, string text)> ToPriorityList()
         {
-            return storage.Enumerate()
+            return storage.All()
                 .Where(_ => _.Project == project)
                 .OrderByDescending(_ => _.Value)
+                .ToArray()
                 .Select(_ => (_.Id, _.Text));
         }
 
@@ -91,12 +92,12 @@
         private void UpdateStored(Dictionary<int, int> update)
         {
             var projectId = storage
-                .Enumerate()
+                .All()
                 .First(_ => _.Id == update.Keys.First())
                 .Project;
             
             var entities = storage
-                .Enumerate()
+                .All()
                 .Where(_ => _.Project == projectId)
                 .ToArray();
             

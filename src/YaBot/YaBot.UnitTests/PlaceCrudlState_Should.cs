@@ -6,10 +6,8 @@
     using App.Core;
     using App.Core.Database;
     using App.Core.State;
-    using App.TelegramApi;
     using FakeItEasy;
     using NUnit.Framework;
-    using Telegram.Bot.Types;
     using YaBot.Core;
     using YaBot.Core.Extensions;
     using YaBot.Core.IO;
@@ -20,7 +18,7 @@
         [Test]
         public void SetHeaderToOwnLine_OnListOperation()
         {
-            var state = CreateForListTest(A.Fake<ICrudl<int, Place>>());
+            var state = CreateForListTest();
 
             // TODO : check first content, not count
             var count = state
@@ -38,8 +36,8 @@
             A.CallTo(() => place.Name).Returns("EXPECTED");
 
             var places = A.Fake<ICrudl<int, Place>>();
-            A.CallTo(() => places.Enumerate())
-                .Returns(new[] { place });
+            A.CallTo(() => places.All())
+                .Returns(place._(ToQuery));
 
             var state = CreateForListTest(places);
 
@@ -58,8 +56,8 @@
             A.CallTo(() => place.Name).Returns("EXPECTED");
 
             var places = A.Fake<ICrudl<int, Place>>();
-            A.CallTo(() => places.Enumerate())
-                .Returns(new[] { place });
+            A.CallTo(() => places.All())
+                .Returns(place._(ToQuery));
 
             var state = CreateForListTest(places);
 
@@ -74,7 +72,7 @@
         [Test]
         public void IncrementIndicesAtHeader_OnListOperation()
         {
-            var state = CreateForListTest(A.Fake<ICrudl<int, Place>>());
+            var state = CreateForListTest();
 
             var actual = state
                 ._(GetTextOutput, A.Fake<IInput>())
@@ -100,8 +98,7 @@
                 {
                     List = new PlaceCrudlState.StateKeys { Keys = keys },
                     Error = error
-                },
-                A.Fake<ICrudl<int, Place>>());
+                });
 
             state.Process(A.Fake<IInput>());
              var (actual, _) = state.Process(A.Fake<IInput>());
@@ -112,7 +109,7 @@
         [Test]
         public void CloseState_AfterListOperation()
         {
-            var state = CreateForListTest(A.Fake<ICrudl<int, Place>>());
+            var state = CreateForListTest();
 
             state.Process(A.Fake<IInput>());
             var (_, actual) = state.Process(A.Fake<IInput>());
@@ -125,7 +122,7 @@
         {
             var place = new Place { Id = 42, Name = "EXPECTED" };
             var places = A.Fake<ICrudl<int, Place>>();
-            A.CallTo(() => places.Enumerate()).Returns(new[] { place });
+            A.CallTo(() => places.All()).Returns(place._(ToQuery));
 
             var input = A.Fake<IInput>();
             A.CallTo(() => input.Text).Returns("1");
@@ -151,7 +148,7 @@
                 places);
         }
 
-        private static PlaceCrudlState CreateForListTest(ICrudl<int, Place> places)
+        private static PlaceCrudlState CreateForListTest(ICrudl<int, Place> places = null)
         {
             var keys = A.Fake<IWords>();
             A.CallTo(() => keys.Match(A<string>._, false)).Returns(true);
@@ -164,8 +161,15 @@
                 places);
         }
 
-        private static PlaceCrudlState Create(PlaceCrudlState.Keys keys, ICrudl<int, Place> places)
+        private static PlaceCrudlState Create(PlaceCrudlState.Keys keys, ICrudl<int, Place> places = null)
         {
+            if (places == null)
+            {
+                places = A.Fake<ICrudl<int, Place>>();
+                A.CallTo(() => places.All())
+                    .Returns(Enumerable.Empty<Place>().AsQueryable());
+            }
+
             return new(
                 keys,
                 places,
@@ -176,7 +180,7 @@
                     Finish = 2,
                     Paginated = true,
                     Total = 3,
-                    Items = items.Select(x => (42, x))
+                    Items = items.AsEnumerable().Select(x => (42, x))
                 },
                 _ => _
             );
@@ -186,6 +190,11 @@
         {
             var (output, _) = state.Process(input);
             return output.Text;
+        }
+
+        private static IQueryable<Place> ToQuery(Place place)
+        {
+            return new[] { place }.AsQueryable();
         }
     }
 }

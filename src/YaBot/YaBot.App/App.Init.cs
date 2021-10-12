@@ -115,7 +115,7 @@
                     new GetRandomPlaceState(
                         keys["GetRandomPlace_Keys"],
                         keys["GetRandomPlace_Next"],
-                        places.Enumerate,
+                        places.All,
                         outputs
                         ),
                     new OrQuestionState(

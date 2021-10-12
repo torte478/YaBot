@@ -20,7 +20,7 @@
         {
             var page = new Page(size);
 
-            var actual = page.Create(Enumerable.Range(0, count), current);
+            var actual = page.Create(CreateQuery(count), current);
 
             Assert.That(actual.Start, Is.EqualTo(start));
             Assert.That(actual.Finish, Is.EqualTo(finish));
@@ -32,7 +32,7 @@
         {
             var page = new Page(10);
 
-            var actual = page.Create(Enumerable.Range(0, 30), 1);
+            var actual = page.Create(CreateQuery(30), 1);
 
             Assert.That(actual.Items.First().Item1, Is.EqualTo(10));
         }
@@ -45,9 +45,14 @@
         {
             var page = new Page(2);
 
-            var actual = page.Create(Enumerable.Range(0, 6), current);
+            var actual = page.Create(CreateQuery(6), current);
 
             Assert.That(actual.Index, Is.EqualTo(expected));
+        }
+
+        private static IQueryable<int> CreateQuery(int size)
+        {
+            return Enumerable.Range(0, size).AsQueryable();
         }
     }
 }

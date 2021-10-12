@@ -1,7 +1,6 @@
 ﻿namespace YaBot.App.Core.State
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using Database;
@@ -18,7 +17,7 @@
         private readonly Keys keys;
         private readonly ICrudl<int, Place> places;
         private readonly IOutputFactory<string, IWords, Place> outputs;
-        private readonly Func<IEnumerable<string>, int, Pagination<string>> paginate;
+        private readonly Func<IQueryable<string>, int, Pagination<string>> paginate;
         private readonly Func<string, string> getTitle;
 
         private State state;
@@ -31,7 +30,7 @@
             Keys keys, 
             ICrudl<int, Place> places, 
             IOutputFactory<string, IWords, Place> outputs,
-            Func<IEnumerable<string>, int, Pagination<string>> paginate,
+            Func<IQueryable<string>, int, Pagination<string>> paginate,
             Func<string, string> getTitle)
         {
             this.keys = keys;
@@ -90,7 +89,7 @@
             if (index == Undefined)
                 return (keys.Error.ToError(error)._(outputs.Create), this);
 
-            var place = places.Enumerate().ToList()[index];
+            var place = places.All().ToList()[index];
             places.Delete(place.Id);
 
             Reset();
@@ -102,7 +101,7 @@
             if (text == null)
                 return (Undefined, "Необходимо ввести текстовое сообщение");
 
-            var list = places.Enumerate().ToList();
+            var list = places.All().ToList();
             var max = list.Count - 1;
 
             var parsed = int.TryParse(text, out var index);
@@ -122,7 +121,7 @@
             if (index == Undefined)
                 return (keys.Error.ToError(error)._(outputs.Create), this);
 
-            var place = places.Enumerate().ToList()[index];
+            var place = places.All().ToList()[index];
 
             Reset();
 
@@ -152,7 +151,7 @@
         private (IOutput, IState) ShowPage(int index)
         {
             var pagination = places
-                .Enumerate()
+                .All()
                 .Select(_ => getTitle(_.Name))
                 ._(paginate, index);
 
