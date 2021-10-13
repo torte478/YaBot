@@ -1,7 +1,7 @@
 ﻿{
   "credentials": "credentials.json",
   "keys": "keys.json",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "pagination": 20,
   "nounCacheMinIndex": 1,
   "nounCacheMaxIndex": 2,
