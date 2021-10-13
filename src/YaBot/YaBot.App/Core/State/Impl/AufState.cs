@@ -15,6 +15,11 @@
 
         public override string Name => "Auf";
 
+        public override bool IsInput(IInput input)
+        {
+            return Keys.Match(input.Text, true);
+        }
+
         protected override string InnerProcess(IInput input)
         {
             return response.ToRandom();
