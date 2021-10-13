@@ -1,20 +1,20 @@
 ﻿namespace YaBot.App.Core.State
 {
     using System;
-    using System.Runtime.CompilerServices;
-    using System.Text;
-    using Extensions;
-    using Outputs;
+    using System.Collections.Immutable;
+    using System.Linq;
+    using YaBot.Extensions;
+    using YaBot.IO;
 
     public sealed class States
     {
-        private readonly string version;
-        private readonly IWords status;
         private readonly IState start;
-        private readonly IWords stoppers;
-        private readonly IWords auf;
-        private readonly IOutputFactory<string, IWords> outputs;
+        private readonly ImmutableArray<IState> liners;
+        private readonly ImmutableArray<IState> resets;
+        private readonly ImmutableArray<IState> stoppers;
         private readonly Action<string> log;
+
+        private bool stopped;
 
         private IState current;
         private IState Current
@@ -23,61 +23,63 @@
             set
             {
                 if (current != value)
+                {
                     log($"{current.Name} => {value.Name}");
+                    Changed.Raise(value.Name);
+                }
                 current = value;
             }
         }
 
         public States(
-            string version,
-            IState start, 
-            IWords stoppers, 
-            IWords auf, 
-            IWords status,
-            IOutputFactory<string, IWords> outputs, 
+            IState start,
+            ImmutableArray<IState> liners,
+            ImmutableArray<IState> resets,
+            ImmutableArray<IState> stoppers,
             Action<string> log)
         {
-            this.version = version;
             this.start = start;
+            this.liners = liners;
+            this.resets = resets;
             this.stoppers = stoppers;
-            this.auf = auf;
-            this.status = status;
-            this.outputs = outputs;
             this.log = log;
 
             current = start;
         }
 
+        public event Action<string> Changed;
+
         public IOutput Process(IInput input)
         {
-            if (status.Match(input.Text))
-                return GetStatus()._(outputs.Create);
-            
-            var reset = Current != start && stoppers.Match(input.Text); 
-            if (reset)
+            if (stopped)
+                return null;
+
+            var stop = stoppers.FirstOrDefault(_ => _.IsInput(input));
+            if (stop != null)
+            {
+                stopped = true;
+                return stop.Process(input).Item1;
+            }
+
+            var reset = resets.FirstOrDefault(_ => _.IsInput(input));
+            if (Current != start && reset != null)
             {
                 Current.Reset();
                 Current = start;
-                return auf._(outputs.Create);
+                return reset.Process(input).Item1;
             }
+
+            var liner = liners.FirstOrDefault(_ => _.IsInput(input));
+            if (liner != null)
+                return liner.Process(input).Item1;
             
-            var (answer, next) =  Current.Process(input);
+            var (answer, next) = Current.Process(input);
 
             next ??= start;
-            
-            Current = next;
-            
-            return answer;
-        }
 
-        private string GetStatus()
-        {
-            return new StringBuilder()
-                .Append("Version: ")
-                .AppendLine(version)
-                .Append("State: ")
-                .AppendLine(Current.ToString())
-                .ToString();
+            Current = next;
+
+            return answer;
         }
     }
 }

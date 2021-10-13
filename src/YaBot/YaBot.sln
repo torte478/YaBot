@@ -2,7 +2,13 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YaBot.App", "YaBot.App\YaBot.App.csproj", "{84CFDEF5-46B2-48A2-AEFE-3EED9DE5FD35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YaBot.Tests", "YaBot.Tests\YaBot.Tests.csproj", "{92DBB633-390E-4869-AA0F-73B1B2261D1A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YaBot.UnitTests", "YaBot.UnitTests\YaBot.UnitTests.csproj", "{92DBB633-390E-4869-AA0F-73B1B2261D1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YaBot", "YaBot\YaBot.csproj", "{B25DE16B-7533-41EC-A264-DAABB5B9496E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YaBot.PriorityApp", "YaBot.PriorityApp\YaBot.PriorityApp.csproj", "{BCAB1786-4172-4FF8-B0A9-AF758F603FFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YaBot.IntegrTests", "YaBot.IntegrTests\YaBot.IntegrTests.csproj", "{A3082E73-C98F-40E6-97AB-DBEC24712319}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +24,17 @@ Global
 		{92DBB633-390E-4869-AA0F-73B1B2261D1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92DBB633-390E-4869-AA0F-73B1B2261D1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92DBB633-390E-4869-AA0F-73B1B2261D1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B25DE16B-7533-41EC-A264-DAABB5B9496E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B25DE16B-7533-41EC-A264-DAABB5B9496E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B25DE16B-7533-41EC-A264-DAABB5B9496E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B25DE16B-7533-41EC-A264-DAABB5B9496E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCAB1786-4172-4FF8-B0A9-AF758F603FFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCAB1786-4172-4FF8-B0A9-AF758F603FFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCAB1786-4172-4FF8-B0A9-AF758F603FFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCAB1786-4172-4FF8-B0A9-AF758F603FFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3082E73-C98F-40E6-97AB-DBEC24712319}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3082E73-C98F-40E6-97AB-DBEC24712319}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3082E73-C98F-40E6-97AB-DBEC24712319}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3082E73-C98F-40E6-97AB-DBEC24712319}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

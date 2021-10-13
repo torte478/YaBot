@@ -5,126 +5,186 @@
     using System.Collections.Immutable;
     using System.Linq;
     using System.Threading;
-    using Configs;
     using Core;
     using Core.Database;
     using Core.State;
-    using Extensions;
     using Newtonsoft.Json;
     using Telegram.Bot;
-    using TelegramApi;
+    using Telegram.Bot.Types.Enums;
+    using YaBot.App.Core.State.Impl;
+    using YaBot;
+    using YaBot.Database;
+    using YaBot.Extensions;
+    using YaBot.IO;
+    using YaBot.IO.Format;
     using File = System.IO.File;
 
     internal partial class App
     {
-        private const string Version = "1.0.0";
-        
-        private const string ConfigPath = "config.json";
-        private const string CredentialsPath = "credentials.json";
+        private const string Settings = "config.json";
 
-        public static App Init()
+        public static App Init(Action<string> log)
         {
-            var credentials = CredentialsPath
-                ._(File.ReadAllText)
+            var config = JsonConfig.Create(Settings);
+
+            var credentials = config["credentials"].GetString()
+                ?._(File.ReadAllText)
                 ._(JsonConvert.DeserializeObject<Credentials>)
                 ?? 
                 throw new Exception("Credentials is null");
 
-            var config = ConfigPath
+            var keys = config["keys"].ToString()
                 ._(File.ReadAllText)
                 ._(JsonConvert.DeserializeObject<Dictionary<string, string[]>>)
                 ?.ToDictionary(
                     _ => _.Key,
                     _ => _.Value._(Words.Create))
-                ?? 
-                throw new Exception("Config is null"); 
-            
-            var context = new Context(credentials.Database);
-            
-            var places = new Crudl<Place>(context, _ => _.Places);
+                ??
+                throw new Exception("Config is null");
 
-            var error = config["Error"];
-            var outputs = new OutputFactory();
-            
+            var context = new Context(credentials.Database);
+
+            var places = new Crudl<Context, Place>(context, _ => _.Places);
+
+            var error = keys["Error"];
+
+            var formattedText = new FormattedText(new IToken[]
+                {
+                    new Token(MessageEntityType.Bold, "**"),
+                    new Token(MessageEntityType.Italic, "~~"),
+                    new LinkToken(MessageEntityType.TextLink, "^^", "|")
+                }
+                .ToImmutableArray());
+            var outputs = new OutputFactory(formattedText.Deserialize);
+            var random = new Random(DateTime.Now.Millisecond);
+
+            var nounCache = new RandomCrudlCache<int, Noun>(
+                (x, y)=> random.Next(x, y + 1),
+                new Crudl<Context,Noun>(
+                    context,
+                    _ => _.Nouns),
+                new RandomCrudlCache<int, Noun>.Args
+                {
+                    Min = config["nounCacheMinIndex"].GetInt32(),
+                    Max = config["nounCacheMaxIndex"].GetInt32(),
+                    Count = config["nounCacheCount"].GetInt32(),
+                    Limit = config["nounCacheLimit"].GetInt32()
+                });
+
             var startState = new StartState(
-                config["Names"],
-                config["Ping"],
+                keys["Names"],
+                keys["Ping"],
                 new IState[]
                 {
                     new PlaceCrudlState(
                         new PlaceCrudlState.Keys
                         {
                             Create = new PlaceCrudlState.StateKeys
-                            {   
-                                Keys = config["PlaceCrudlState_Create_Keys"],
-                                Start = config["PlaceCrudlState_Create_Start"],
-                                Success = config["PlaceCrudlState_Create_Success"]
+                            {
+                                Keys = keys["PlaceCrudlState_Create_Keys"],
+                                Start = keys["PlaceCrudlState_Create_Start"],
+                                Success = keys["PlaceCrudlState_Create_Success"]
                             },
                             Read = new PlaceCrudlState.StateKeys
                             {
-                                Keys = config["PlaceCrudlState_Read_Keys"],
-                                Start = config["PlaceCrudlState_Read_Start"]
+                                Keys = keys["PlaceCrudlState_Read_Keys"],
+                                Start = keys["PlaceCrudlState_Read_Start"]
                             },
                             Delete = new PlaceCrudlState.StateKeys
                             {
-                                Keys = config["PlaceCrudlState_Delete_Keys"],
-                                Start = config["PlaceCrudlState_Delete_Start"],
-                                Success = config["PlaceCrudlState_Delete_Success"] 
+                                Keys = keys["PlaceCrudlState_Delete_Keys"],
+                                Start = keys["PlaceCrudlState_Delete_Start"],
+                                Success = keys["PlaceCrudlState_Delete_Success"]
                             },
                             List =  new PlaceCrudlState.StateKeys
                             {
-                                Keys = config["PlaceCrudlState_List_Keys"],
-                                Success = config["PlaceCrudlState_List_Success"] 
+                                Keys = keys["PlaceCrudlState_List_Keys"],
+                                Success = keys["PlaceCrudlState_List_Success"],
+                                Next = keys["PlaceCrudlState_List_Next"],
+                                Previous = keys["PlaceCrudlState_List_Previous"]
                             },
                             Error = error
                         },
                         places,
+                        outputs,
+                        new Page(config["pagination"].GetInt32()).Create,
+                        new Title(
+                            config["titleLength"].GetInt32(),
+                            _ => formattedText.Deserialize(_).Item1)
+                            .Create),
+                    new GetRandomPlaceState(
+                        keys["GetRandomPlace_Keys"],
+                        keys["GetRandomPlace_Next"],
+                        places.All,
                         outputs
                         ),
-                    new GetRandomPlaceState(
-                        config["GetRandomPlace_Keys"],
-                        config["GetRandomPlace_Next"],
-                        places.Enumerate,
-                        outputs
-                        )
+                    new OrQuestionState(
+                        keys["Question_Success"],
+                        outputs,
+                        () => random.Next(2)),
+                    new WhoQuestionState(
+                        keys["Question_Success"],
+                        keys["WhoQuestion_Answers"],
+                        outputs),
+                    new QuestionState(
+                        keys["Question_Success"],
+                        outputs,
+                        () => nounCache.Next().Text)
                 }
                 .ToImmutableArray(),
                 outputs.Create);
 
-            States CreateStates() => new States(
-                Version,
-                startState, 
-                config["Reset"],
-                config["Auf"],
-                config["Status"],
-                outputs,
-                Log);
+            States CreateStates()
+            {
+                var status = new StatusState(
+                    keys["Status"],
+                    outputs,
+                    config["version"].GetString());
+                var states = new States(
+                    startState,
+                    new IState[]
+                        {
+                            status,
+                            new AufState(
+                                keys["Auf_Auf_Key"], outputs, keys["Auf_Auf_Success"]),
+                            new AufState(keys["Auf_Work_Key"], outputs, keys["Auf_Work_Success"])
+                        }
+                        .ToImmutableArray(),
+                    new IState[]
+                        {
+                            new AufState(keys["Reset"], outputs, keys["Auf"])
+                        }
+                        .ToImmutableArray(),
+                    new IState[]
+                        {
+                            new AufState(keys["Stop_Key"], outputs, keys["Stop_Success"])
+                        }
+                        .ToImmutableArray(),
+                    log);
+
+                states.Changed += status.Update;
+                status.Update(startState.Name);
+
+                return states;
+            }
 
             var bot = new Bot(createReceiver: 
                 () => CreateStates().Process,
-                begin: DateTime.UtcNow); 
+                begin: DateTime.UtcNow,
+                log);
 
-            var handler = new Handler(Input.CreateAsync, bot.Receive, Log);
+            var handler = new Handler(
+                new InputFactory(formattedText.Serialize).CreateAsync,
+                bot.Receive,
+                _ => new JsonUpdate(_).ToString(),
+                log);
 
             return new App(
                 new TelegramBotClient(credentials.Telegram),
                 new CancellationTokenSource(),
                 (client, cancellation) => client.ReceiveAsync(handler, cancellationToken: cancellation),
                 context,
-                Log);
-        }
-
-        private static void Log(string message)
-        {
-            #if DEBUG
-
-            if (string.IsNullOrEmpty(message))
-                return;
-            
-            $"{DateTime.Now.ToLongTimeString()} {message}"
-                ._(Console.WriteLine);
-            
-            #endif
+                log);
         }
     }
 }

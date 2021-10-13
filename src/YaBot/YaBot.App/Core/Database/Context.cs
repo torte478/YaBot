@@ -19,6 +19,7 @@ namespace YaBot.App.Core.Database
             this.connectionString = connectionString;
         }
 
+        public virtual DbSet<Noun> Nouns { get; set; }
         public virtual DbSet<Place> Places { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -32,6 +33,18 @@ namespace YaBot.App.Core.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "Russian_Russia.1251");
+
+            modelBuilder.Entity<Noun>(entity =>
+            {
+                entity.ToTable("noun");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Text)
+                    .IsRequired()
+                    .HasColumnType("character varying")
+                    .HasColumnName("text");
+            });
 
             modelBuilder.Entity<Place>(entity =>
             {

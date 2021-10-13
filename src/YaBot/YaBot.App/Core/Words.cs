@@ -4,30 +4,39 @@
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
+    using System.Text.RegularExpressions;
+    using YaBot.Extensions;
 
     public sealed class Words : IWords
     {
-        private readonly ImmutableArray<string> words;
+        private static readonly Regex Regex = new Regex(@"(\w+)");
+
+        private readonly ImmutableHashSet<string> keys;
 
         public static IWords Create(IEnumerable<string> words)
         {
-            return new Words(words.ToImmutableArray());
+            return new Words(words.ToImmutableHashSet());
         }
         
-        public Words(ImmutableArray<string> words)
+        private Words(ImmutableHashSet<string> keys)
         {
-            this.words = words;
+            this.keys = keys;
         }
 
-        public bool Match(string text)
+        public bool Match(string text, bool substring)
         {
-            return text != null 
-                   && words.Any(text.Contains);
+            if (text == null)
+                return false;
+
+            var lower = text.ToLower();
+            return substring
+                ? keys.Any(lower.Contains)
+                : lower._(Regex.Split).Any(keys.Contains);
         }
         
         public IEnumerator<string> GetEnumerator()
         {
-            return words.AsEnumerable().GetEnumerator();
+            return keys.AsEnumerable().GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
