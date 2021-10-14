@@ -173,8 +173,10 @@
                 begin: DateTime.UtcNow,
                 log);
 
+            var inputFactory = new InputFactory(formattedText.Serialize, RemoteFile.Load);
+
             var handler = new Handler(
-                new InputFactory(formattedText.Serialize).CreateAsync,
+                inputFactory.CreateAsync,
                 bot.Receive,
                 _ => new JsonUpdate(_).ToString(),
                 log);
