@@ -1,6 +1,7 @@
 ﻿namespace YaBot.Tests
 {
     using System;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using FakeItEasy;
@@ -9,6 +10,7 @@
     using Telegram.Bot.Types;
     using YaBot;
     using YaBot.IO;
+    using YaBot.Tests.Fake;
     using static System.Threading.Tasks.Task;
 
     [TestFixture]
@@ -34,7 +36,7 @@
         {
             var update = new Update { Message = new Message() };
 
-            await handler.HandleUpdateAsync(null, update, new CancellationToken());
+            await handler.HandleUpdateAsync(null, update, CancellationToken.None);
 
             Assert.That(receiver.Called, Is.True);
         }
@@ -43,13 +45,13 @@
         public void CheckThatMessageIsNotNull_WhenLog()
         {
             Assert.DoesNotThrowAsync(() =>
-                handler.HandleUpdateAsync(null, new Update(), new CancellationToken()));
+                handler.HandleUpdateAsync(null, new Update(), CancellationToken.None));
         }
 
         [Test]
         public async Task IgnoreMessage_WhenItIsNull()
         {
-            await handler.HandleUpdateAsync(null, new Update(), new CancellationToken());
+            await handler.HandleUpdateAsync(null, new Update(), CancellationToken.None);
 
             Assert.That(receiver.Called, Is.False);
         }
@@ -59,7 +61,7 @@
         {
             var update = new Update { Message = new Message { ForwardFrom = A.Fake<User>() } };
 
-            await handler.HandleUpdateAsync(null, update, new CancellationToken());
+            await handler.HandleUpdateAsync(null, update, CancellationToken.None);
 
             Assert.That(receiver.Called, Is.False);
         }
@@ -73,7 +75,7 @@
                 actual += _;
             };
 
-            var instance = Create(
+            var handler = Create(
                 (_, _, _) => Run(() =>
                 {
                     throw new Exception("EXPECTED");
@@ -85,7 +87,7 @@
                 log);
 
             Assert.ThrowsAsync<Exception>(() =>
-                instance.HandleUpdateAsync(null, new Update {Message = new Message()}, new CancellationToken()));
+                handler.HandleUpdateAsync(null, new Update {Message = new Message()}, CancellationToken.None));
 
             Assert.That(actual.Contains("EXPECTED"), Is.True);
         }
@@ -104,9 +106,41 @@
                 _ => null,
                 log);
 
-            await instance.HandleUpdateAsync(null, new Update {Message = new Message()}, new CancellationToken());
+            await instance.HandleUpdateAsync(null, new Update {Message = new Message()}, CancellationToken.None);
 
             Assert.That(actual.Contains("=>"), Is.False);
+        }
+
+        [Test]
+        public async Task SendCaptionEntities_WhenOutputHasImage()
+        {
+            var output = A.Fake<IOutput>();
+            var expected = new MessageEntity();
+            A.CallTo(() => output.IsImage).Returns(true);
+            A.CallTo(() => output.Image).Returns(new byte[0]);
+            A.CallTo(() => output.MessageEntities).Returns(new[] { expected });
+
+            var handler = Create(
+                (_, _, _) => Run(A.Fake<IInput>),
+                _ => output,
+                _ => { }
+            );
+
+            var client = new FakeClient();
+            await handler.HandleUpdateAsync(
+                    client,
+                    new Update
+                    {
+                        Message = new Message
+                        {
+                            Chat = new Chat()
+                        }
+
+                    }, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            var actual = client.LastPhotoRequest?.CaptionEntities?.First();
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
         private static Handler Create(

@@ -27,10 +27,9 @@
         [Test]
         public void CheckTokenAtSameString_OnSerialize()
         {
-            var actual = formattedText.Serialize(new Message
-            {
-                Text = "01234567",
-                Entities = new MessageEntity[]
+            var actual = formattedText.Serialize(
+                "01234567",
+                new MessageEntity[]
                 {
                     new()
                     {
@@ -45,8 +44,7 @@
                         Length = 2,
                         Url = "abc"
                     }
-                }
-            });
+                });
 
             Assert.That(actual, Is.EqualTo("0**123**4^^56|abc^^7"));
         }

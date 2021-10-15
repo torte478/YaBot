@@ -37,7 +37,7 @@
             this.toInputAsync = toInputAsync;
         }
 
-        public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        public async Task HandleUpdateAsync(ITelegramBotClient client, Update update, CancellationToken cancellationToken)
         {
             try
             {
@@ -47,12 +47,12 @@
 #if DEBUG
                 log($"{update.Message?.Text ?? "?"}");
 #endif
-                var input = await toInputAsync(botClient, update, cancellationToken)
+                var input = await toInputAsync(client, update, cancellationToken)
                     .ConfigureAwait(false);
 
                 var output = receive(input);
 
-                await SendAsync(botClient, update.Message.Chat, output, cancellationToken)
+                await SendAsync(client, update.Message.Chat, output, cancellationToken)
                     .ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -82,6 +82,7 @@
                     chat, 
                     new InputOnlineFile(stream),
                     output.Text,
+                    captionEntities: output.MessageEntities,
                     cancellationToken: cancellation)
                     .ConfigureAwait(false);
             }

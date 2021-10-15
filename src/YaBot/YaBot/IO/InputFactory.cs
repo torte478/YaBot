@@ -9,11 +9,11 @@
 
     public sealed class InputFactory
     {
-        private readonly Func<Message, string> serialize;
+        private readonly Func<string, MessageEntity[], string> serialize;
         private readonly Func<ITelegramBotClient, Update, CancellationToken, Task<byte[]>> loadImageAsync;
 
         public InputFactory(
-            Func<Message, string> serialize,
+            Func<string, MessageEntity[], string> serialize,
             Func<ITelegramBotClient, Update, CancellationToken, Task<byte[]>> loadImageAsync)
         {
             this.serialize = serialize;
@@ -26,13 +26,16 @@
             {
                 Date = update!.Message!.Date,
                 Chat = update.Message.Chat.Id,
-                Text = update.Message._(serialize)
             };
 
-            if (update.Message.Photo != null)
+            if (update.Message.Photo == null)
+            {
+                input.Text = update.Message._(_ => serialize(_.Text, _.Entities));
+            }
+            else
             {
                 input.Image = await loadImageAsync(client, update, cancellation);
-                input.Text = update.Message.Caption;
+                input.Text = update.Message._(_ => serialize(_.Caption, _.CaptionEntities));
             }
 
             return input;
