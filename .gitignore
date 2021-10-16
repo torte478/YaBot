@@ -186,3 +186,5 @@ FakesAssemblies/
 # My files
 git-bash.lnk
 .idea
+/backlog.txt
+/backup
