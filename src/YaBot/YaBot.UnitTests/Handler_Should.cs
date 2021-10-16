@@ -67,7 +67,7 @@
         }
 
         [Test]
-        public void CatchExceptions_FromHandleUpdate()
+        public async Task CatchExceptions_FromHandleUpdate()
         {
             var actual = string.Empty;
             Action<string> log = _ =>
@@ -86,10 +86,33 @@
                 _ => null,
                 log);
 
-            Assert.ThrowsAsync<Exception>(() =>
-                handler.HandleUpdateAsync(null, new Update {Message = new Message()}, CancellationToken.None));
+            await handler.HandleUpdateAsync(null, new Update {Message = new Message()}, CancellationToken.None)
+                .ConfigureAwait(false);
 
             Assert.That(actual.Contains("EXPECTED"), Is.True);
+        }
+
+        [Test]
+        public async Task SendExceptionMessage_OnCatchedErrors()
+        {
+            var client = new FakeClient();
+
+            var handler = Create(
+                (_, _, _) => Run(() =>
+                {
+                    throw new Exception("EXPECTED");
+#pragma warning disable 162
+                    return A.Fake<IInput>();
+#pragma warning restore 162
+                }),
+                _ => null,
+                _ => { });
+
+            var update = new Update {Message = new Message { Chat = new Chat() }};
+            await handler.HandleUpdateAsync(client, update, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            Assert.That(client.LastText, Is.EqualTo("EXPECTED"));
         }
 
         [Test]
@@ -148,7 +171,8 @@
             Func<IInput, IOutput> receive,
             Action<string> log)
         {
-            return new Handler(toInputAsync, receive, _ => string.Empty, log);
+            var outputs = new FakeOutputFactory();
+            return new Handler(toInputAsync, receive, _ => string.Empty, outputs.Create, log);
         }
 
         private class FakeReceiver

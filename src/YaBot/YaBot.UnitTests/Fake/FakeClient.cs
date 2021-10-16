@@ -13,11 +13,15 @@
     internal sealed class FakeClient : ITelegramBotClient
     {
         public SendPhotoRequest LastPhotoRequest { get; private set; }
+        public string LastText { get; private set; }
 
         public Task<TResponse> MakeRequestAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = new CancellationToken())
         {
             if (request is SendPhotoRequest photo)
                 LastPhotoRequest = photo;
+
+            if (request is SendMessageRequest message)
+                LastText = message.Text;
 
             return Task.Run(() => default(TResponse));
         }

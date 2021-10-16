@@ -13,6 +13,7 @@
     using Telegram.Bot.Types.Enums;
     using YaBot.App.Core.State.Impl;
     using YaBot;
+    using YaBot.App.Extensions;
     using YaBot.Database;
     using YaBot.Extensions;
     using YaBot.IO;
@@ -179,6 +180,7 @@
                 inputFactory.CreateAsync,
                 bot.Receive,
                 _ => new JsonUpdate(_).ToString(),
+                _ => _._(error.ToError)._(outputs.Create),
                 log);
 
             return new App(

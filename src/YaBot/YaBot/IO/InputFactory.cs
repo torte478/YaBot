@@ -22,6 +22,15 @@
 
         public async Task<IInput> CreateAsync(ITelegramBotClient client, Update update, CancellationToken cancellation)
         {
+            var document = update?.Message?.Document;
+            if (document != null)
+            {
+                var error = document.MimeType?.Contains("image") ?? false
+                    ? " Нельзя отправлять изображения без нажатой галочки сжатия"
+                    : string.Empty;
+                throw new Exception($"Неверный формат сообщения.{error}");
+            }
+
             var input = new Input
             {
                 Date = update!.Message!.Date,
