@@ -18,24 +18,21 @@
         public IOutput Create(string input)
         {
             var output = Create();
-            A.CallTo(() => output.Text)
-                .Returns(input);
+            A.CallTo(() => output.Text).Returns(input);
             return output;
         }
 
         public IOutput Create(Place input)
         {
             var output = Create();
-            A.CallTo(() => output.Text)
-                .Returns(input.Name);
+            A.CallTo(() => output.Text).Returns(input.Name);
             return output;
         }
 
         public IOutput Create(IWords input)
         {
             var output = Create();
-            A.CallTo(() => output.Text)
-                .Returns(input?.FirstOrDefault());
+            A.CallTo(() => output.Text).Returns(input?.FirstOrDefault());
             return output;
         }
 
@@ -43,6 +40,7 @@
         {
             var output = A.Fake<IOutput>();
             A.CallTo(() => output.MessageEntities).Returns(Array.Empty<MessageEntity>());
+            A.CallTo(() => output.IsText).Returns(true);
             return output;
         }
     }

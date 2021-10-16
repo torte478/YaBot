@@ -13,6 +13,7 @@
     using Telegram.Bot.Types.Enums;
     using YaBot.App.Core.State.Impl;
     using YaBot;
+    using YaBot.App.Extensions;
     using YaBot.Database;
     using YaBot.Extensions;
     using YaBot.IO;
@@ -152,12 +153,12 @@
                         .ToImmutableArray(),
                     new IState[]
                         {
-                            new AufState(keys["Reset"], outputs, keys["Auf"])
+                            new AufState(keys["Reset"], outputs, keys["Auf"], false)
                         }
                         .ToImmutableArray(),
                     new IState[]
                         {
-                            new AufState(keys["Stop_Key"], outputs, keys["Stop_Success"])
+                            new AufState(keys["Stop_Key"], outputs, keys["Stop_Success"], false)
                         }
                         .ToImmutableArray(),
                     log);
@@ -173,10 +174,13 @@
                 begin: DateTime.UtcNow,
                 log);
 
+            var inputFactory = new InputFactory(formattedText.Serialize, RemoteFile.Load);
+
             var handler = new Handler(
-                new InputFactory(formattedText.Serialize).CreateAsync,
+                inputFactory.CreateAsync,
                 bot.Receive,
                 _ => new JsonUpdate(_).ToString(),
+                _ => _._(error.ToError)._(outputs.Create),
                 log);
 
             return new App(
