@@ -45,7 +45,7 @@
                     return;
 
 #if DEBUG
-                log($"{update.Message?.Text ?? "?"}");
+                log($"{update.Message?.Text ?? update.Message?.Caption ?? "?"}");
 #endif
                 var input = await toInputAsync(client, update, cancellationToken)
                     .ConfigureAwait(false);

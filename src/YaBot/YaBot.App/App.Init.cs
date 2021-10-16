@@ -152,12 +152,12 @@
                         .ToImmutableArray(),
                     new IState[]
                         {
-                            new AufState(keys["Reset"], outputs, keys["Auf"])
+                            new AufState(keys["Reset"], outputs, keys["Auf"], false)
                         }
                         .ToImmutableArray(),
                     new IState[]
                         {
-                            new AufState(keys["Stop_Key"], outputs, keys["Stop_Success"])
+                            new AufState(keys["Stop_Key"], outputs, keys["Stop_Success"], false)
                         }
                         .ToImmutableArray(),
                     log);
