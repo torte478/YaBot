@@ -22,5 +22,18 @@
 
             Assert.That(match, Is.True);
         }
+
+        [Test]
+        public void MatchFullWorld_WhenCreatedWithFlag()
+        {
+            var keys = A.Fake<IWords>();
+            A.CallTo(() => keys.Match(A<string>._, false)).Returns(true);
+
+            var state = new AufState(keys, new FakeOutputFactory(), A.Fake<IWords>(), false);
+
+            var match = state.IsInput(A.Fake<IInput>());
+
+            Assert.That(match, Is.True);
+        }
     }
 }

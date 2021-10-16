@@ -16,14 +16,15 @@
             this.formats = formats;
         }
 
-        public string Serialize(Message message)
+        public string Serialize(string text, MessageEntity[] entities)
         {
-            return message switch
-            {
-                null or {Text: null} or {Text: ""} => null,
-                {Entities: null} => message.Text,
-                _ => InnerSerialize(message)
-            };
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            if (entities == null)
+                return text;
+
+            return InnerSerialize(text, entities);
         }
 
         public (string, MessageEntity[]) Deserialize(string text)
@@ -51,32 +52,32 @@
             return (result.ToString(), entities.ToArray());
         }
 
-        private string InnerSerialize(Message message)
+        private string InnerSerialize(string text, MessageEntity[] messageEntities)
         {
-            var entities = message.Entities
+            var tokens = messageEntities
                 !.Where(_ => formats.Any(f => f.Type == _.Type))
                 .OrderBy(_ => _.Offset)
                 ._(_ => new Queue<MessageEntity>(_));
 
             var result = new StringBuilder();
-            for (var i = 0; i < message.Text!.Length; ++i)
+            for (var i = 0; i < text!.Length; ++i)
             {
-                if (entities.TryPeek(out var entity) && entity.Offset == i)
+                if (tokens.TryPeek(out var entity) && entity.Offset == i)
                 {
                     var end = entity.Offset + entity.Length - 1;
                     var format = formats.Single(_ => _.Type == entity.Type);
 
-                    message.Text
+                    text
                         .Substring(entity.Offset, entity.Length)
                         ._(_ => format.Serialize(entity, _))
                         ._(result.Append);
 
-                    entities.Dequeue();
+                    tokens.Dequeue();
                     i = end;
                 }
                 else
                 {
-                    result.Append(message.Text[i]);
+                    result.Append(text[i]);
                 }
             }
 

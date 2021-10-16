@@ -49,7 +49,8 @@
                 new InputFactory(
                     new FormattedText(
                         ImmutableArray<IToken>.Empty
-                        ).Serialize)
+                        ).Serialize,
+                    RemoteFile.Load)
                     .CreateAsync,
                 bot.Receive,
                 _ => new JsonUpdate(_).ToString(),
