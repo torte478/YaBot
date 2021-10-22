@@ -54,6 +54,7 @@
                     .CreateAsync,
                 bot.Receive,
                 _ => new JsonUpdate(_).ToString(),
+                _ => new Output { Text = _ },
                 Log);
 
             return new App(
@@ -69,15 +70,11 @@
 
         private static void Log(string message)
         {
-            #if DEBUG
-
             if (string.IsNullOrEmpty(message))
                 return;
             
             $"{DateTime.Now.ToLongTimeString()} {message}"
                 ._(Console.WriteLine);
-            
-            #endif
         }
     }
 }

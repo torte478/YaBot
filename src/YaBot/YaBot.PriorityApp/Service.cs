@@ -54,7 +54,7 @@ namespace YaBot.PriorityApp
         {
             var command = input.Text.Split(' ');
             
-            return command[0] switch
+            return command[0].ToLower() switch
             {
                 "status" => GetStatus(),
 
